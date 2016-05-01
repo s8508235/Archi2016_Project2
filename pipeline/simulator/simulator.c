@@ -12,8 +12,8 @@ FILE *iImageData,*dImageData;
 int main()
 {
     cycle = 0;
-    iImageData = fopen("iimage.bin","rb");//102062104_01 102062111 102062202_01
-    dImageData = fopen("dimage.bin","rb");//102070028_01
+    iImageData = fopen("iimage.bin","rb");
+    dImageData = fopen("dimage.bin","rb");
     int isize,dsize;
     fseek(iImageData,0,SEEK_END);
     isize = ftell(iImageData);
@@ -97,12 +97,45 @@ int main()
     err = fopen("error_dump.rpt","wb");
     currpc = 0;
     init_buffer();
-    WB();
-    DM();
-    EX();
-    if(end_program ==1) return 0;
-    ID();
-    if(end_program ==1) return 0;
-    IF();
+    int wb_stop = 0;
+    while(wb_stop == 0)
+    {
+        end_program = 0;
+    //   int wb_data = MEM2WB.instruction_op;
+        /*previous wb's state*/
+        fprintf(out,"cycle %d\n",cycle++);
+        char* wb_command = MEM2WB.command;
+        int wb_isNOP = MEM2WB.isNop;
+        wb_stop = MEM2WB.stop;
+        currpc = IF2ID.pc;
+        WB();
+        DM();
+        EX();
+        if(end_program ==1) break;
+        ID();
+        IF();
+        printf("%d %d\n",pc,currpc);
+        for(i=0;i<32;i++)
+        {
+            if(i<10)
+            fprintf(out,"$0%d: 0x",i);
+            else
+            fprintf(out,"$%d: 0x",i);
+            fprintf(out,"%08X\n",reg[i]);
+        }
+        fprintf(out,"PC: 0x%08X\n",pc+currpc);
+        fprintf(out,"IF: 0x%08X",IF2ID.instruction_op);
+        if(ID2EX.isStall ==1) fprintf(out," to_be_stalled");
+        fprintf(out,"\n");
+        fprintf(out,"ID: %s",(/*(ID2EX.command =="SLL"  && ID2EX.instruction_op  ==0x00000000 )|| */ID2EX.isNop ==1)?"NOP":ID2EX.command);
+        if(ID2EX.isStall ==1) fprintf(out," to_be_stalled");
+        else if(ID2EX.need_forward ==1) fprintf(out," fwd_EX-DM_rs_$%d",ID2EX.rs);
+        else if(ID2EX.need_forward ==2) fprintf(out," fwd_EX-DM_rt_$%d",ID2EX.rt);
+        fprintf(out,"\n");
+        fprintf(out,"EX: %s\n",(/*(EX2MEM.command =="SLL" && EX2MEM.instruction_op ==0x00000000 )||*/ EX2MEM.isNop ==1)?"NOP":EX2MEM.command);
+        fprintf(out,"DM: %s\n",(/*(MEM2WB.command =="SLL" && MEM2WB.instruction_op ==0x00000000 )|| */MEM2WB.isNop ==1)?"NOP":MEM2WB.command);
+        fprintf(out,"WB: %s",(/*(wb_command =="SLL" && wb_data ==0x00000000)||*/wb_isNOP ==1)?"NOP":wb_command);
+        fprintf(out,"\n\n\n");
+    }
     return 0;
 }

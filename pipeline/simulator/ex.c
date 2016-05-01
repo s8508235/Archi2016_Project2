@@ -3,15 +3,29 @@ int mask_31 = 0x80000000;
 int mask_15 = 0x8000;
 void EX()
 {
-    EX2MEM.addr  += 4 ;
+    branch_forward_detect();
+    EX2MEM.addr  = ID2EX.addr ;
     EX2MEM.opcode=ID2EX.opcode;
     EX2MEM.tmp_rt = ID2EX.tmp_rt;
+    EX2MEM.func = ID2EX.func;
+    EX2MEM.instruction_op = ID2EX.instruction_op;
+    EX2MEM.command = ID2EX.command;
+    EX2MEM.isNop = ID2EX.isNop;
+    EX2MEM.isStall = 0;
+  //  printf("opcode :%x\n",ID2EX.opcode);
+  //  printf("func :%x\n",ID2EX.func);
+    if(ID2EX.isStall ==1)
+    {
+        EX2MEM.isStall = 1;
+        EX2MEM.opcode = 0;
+        EX2MEM.instruction_op = 0;
+        EX2MEM.isNop = 1;
+    }
     int i;
     for(i=0; i<32; i++)
     {
         masks[i] = 1 <<i;
     }
-    end_program = 0;
     if(ID2EX.opcode == 0)
     {
         implementR();
@@ -24,16 +38,20 @@ void EX()
     {
         implementI();
     }
+    EX2MEM.stop = ID2EX.stop;
 }
 void implementJ()
 {
     if(ID2EX.opcode == j)
     {
-        pc = ID2EX.addr;
+        printf("J!!!\n");
+        EX2MEM.addr = ((ID2EX.addr+4) & 0xf0000000) | (ID2EX.immediate <<2);
     }
     else if(ID2EX.opcode == jal)
     {
-        pc = ID2EX.addr;
+        printf("JAL!!!\n");
+        EX2MEM.addr = ((ID2EX.addr+4+pc) & 0xf0000000) | (ID2EX.immediate <<2);
+        //pc = ID2EX.addr;
 
     }
 }
@@ -141,7 +159,7 @@ void implementI()
     {
         sRs = ID2EX.tmp_rs & mask_31;
         EX2MEM.ALUout = ID2EX.tmp_rs + ID2EX.immediate;
-        EX2MEM.write_dest = ID2EX.rd;
+        EX2MEM.write_dest = ID2EX.rt;
         sRt = (ID2EX.tmp_rt & mask_31)?1:0;
         sRt = ID2EX.tmp_rt & mask_31;
         if(sRs == (ID2EX.immediate & mask_31) && sRs !=sRt)
@@ -152,7 +170,7 @@ void implementI()
     else if(ID2EX.opcode == addiu)
     {
         EX2MEM.ALUout = ID2EX.tmp_rs + ID2EX.immediate;
-        EX2MEM.write_dest = ID2EX.rd;
+        EX2MEM.write_dest = ID2EX.rt;
     }
     else if(ID2EX.opcode == lw)
     {
@@ -176,7 +194,7 @@ void implementI()
             return ;
         }
         EX2MEM.ALUout = 0;
-        EX2MEM.write_dest = ID2EX.rd;
+        EX2MEM.write_dest = ID2EX.rt;
         EX2MEM.addr = addr;
     }
     else if(ID2EX.opcode == lh)
@@ -201,7 +219,7 @@ void implementI()
             return ;
         }
         EX2MEM.ALUout = 0;
-        EX2MEM.write_dest = ID2EX.rd;
+        EX2MEM.write_dest = ID2EX.rt;
         EX2MEM.addr = addr;
     }
     else if(ID2EX.opcode == lhu)
@@ -226,7 +244,7 @@ void implementI()
             return ;
         }
         EX2MEM.ALUout = 0;
-        EX2MEM.write_dest = ID2EX.rd;
+        EX2MEM.write_dest = ID2EX.rt;
         EX2MEM.addr = addr;
     }
     else if(ID2EX.opcode == lb)
@@ -250,7 +268,7 @@ void implementI()
         }
         addr = ID2EX.immediate + ID2EX.tmp_rs;
         EX2MEM.ALUout = 0;
-        EX2MEM.write_dest = ID2EX.rd;
+        EX2MEM.write_dest = ID2EX.rt;
         EX2MEM.addr = addr;
     }
     else if(ID2EX.opcode == lbu)
@@ -272,7 +290,7 @@ void implementI()
             return ;
         }
             EX2MEM.ALUout = 0;
-            EX2MEM.write_dest = ID2EX.rd;
+            EX2MEM.write_dest = ID2EX.rt;
             EX2MEM.addr = addr;;
     }
     else if(ID2EX.opcode == sw)
@@ -301,7 +319,7 @@ void implementI()
             int i;
             int tmp = ID2EX.tmp_rt;
             EX2MEM.addr = addr;
-            EX2MEM.write_dest = ID2EX.rd;
+            EX2MEM.write_dest = ID2EX.rt;
             for(i=0; i<32; i++)
             {
                 if(tmp & masks[31-i])
@@ -341,7 +359,7 @@ void implementI()
         {
             int i;
             EX2MEM.addr = addr;
-            EX2MEM.write_dest = ID2EX.rd;
+            EX2MEM.write_dest = ID2EX.rt;
             int tmp = ID2EX.tmp_rt & 0x0000FFFF;
             for(i=0; i<16; i++)
             {
@@ -379,7 +397,7 @@ void implementI()
         addr = ID2EX.immediate + ID2EX.tmp_rs;
         {
             EX2MEM.addr = addr;
-            EX2MEM.write_dest = ID2EX.rd;
+            EX2MEM.write_dest = ID2EX.rt;
             int i;
             int tmp = ID2EX.tmp_rt & 0x000000FF;
             for(i=0; i<8; i++)
@@ -399,32 +417,33 @@ void implementI()
     else if(ID2EX.opcode == lui)
     {
         EX2MEM.ALUout = ID2EX.immediate <<16;
-        EX2MEM.write_dest = ID2EX.rd;
+        EX2MEM.write_dest = ID2EX.rt;
     }
     else if(ID2EX.opcode == andi)
     {
         EX2MEM.ALUout = ID2EX.tmp_rs & ID2EX.immediate;
-        EX2MEM.write_dest = ID2EX.rd;
+        EX2MEM.write_dest = ID2EX.rt;
     }
     else if(ID2EX.opcode == ori)
     {
 
         EX2MEM.ALUout = ID2EX.tmp_rs | ID2EX.immediate;
-        EX2MEM.write_dest = ID2EX.rd;
+        EX2MEM.write_dest = ID2EX.rt;
     }
     else if(ID2EX.opcode == nori)
     {
         EX2MEM.ALUout = ~(ID2EX.tmp_rs | ID2EX.immediate);
-        EX2MEM.write_dest = ID2EX.rd;
+        EX2MEM.write_dest = ID2EX.rt;
     }
     else if(ID2EX.opcode == slti )
     {
         int intImm = ID2EX.immediate;
         int sRs = ID2EX.tmp_rs;
         EX2MEM.ALUout = sRs < intImm;
+        EX2MEM.write_dest = ID2EX.rt;
     }
     else if(ID2EX.opcode == beq)
-    {
+    {EX2MEM.write_dest = 0;
         if(ID2EX.tmp_rs==ID2EX.tmp_rt)
         {
             int x = ID2EX.immediate;
@@ -441,7 +460,7 @@ void implementI()
         }
     }
     else if(ID2EX.opcode == bne)
-    {
+    {EX2MEM.write_dest = 0;
         if(ID2EX.tmp_rs!=ID2EX.tmp_rt)
         {
             int x = ID2EX.immediate;
@@ -458,7 +477,7 @@ void implementI()
         }
     }
     else if(ID2EX.opcode == bgtz)
-    {
+    {EX2MEM.write_dest = 0;
         sRs = (ID2EX.tmp_rs & mask_31) ? 1:0;
         if(ID2EX.tmp_rs>0 && sRs==0)
         {
@@ -487,4 +506,22 @@ void err_processing(int errtype)
     {
         fprintf(err, "In cycle %d: Misalignment Error\n", cycle);
     }
+}
+void branch_forward_detect()
+{
+    if(EX2MEM.addr != ID2EX.addr)
+    {
+         if(EX2MEM.write_dest == ID2EX.rs && EX2MEM.write_dest !=0)
+        {printf("%s\n",EX2MEM.command);
+            EX2MEM.need_forward = 1;
+            printf("forward to id 1 %s dest:%d\n",ID2EX.command,EX2MEM.write_dest);
+        }
+        else if(EX2MEM.write_dest == ID2EX.rt&& EX2MEM.write_dest !=0)
+        {printf("%s\n",EX2MEM.command);
+            EX2MEM.need_forward = 2;
+            printf("forward to id 2 %s dest:%d\n",ID2EX.command,EX2MEM.write_dest);
+        }
+        else EX2MEM.need_forward = 0;
+    }
+
 }

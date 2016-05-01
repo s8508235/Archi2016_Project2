@@ -7,6 +7,7 @@ void EX();
 void implementR();
 void implementJ();
 void implementI();
+void branch_forward_detect();
 void err_processing(int errtype);
 int masks[31];
 #endif // EX_H_INCLUDED
