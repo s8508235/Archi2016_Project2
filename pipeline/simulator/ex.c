@@ -20,6 +20,11 @@ void EX()
         EX2MEM.opcode = 0;
         EX2MEM.instruction_op = 0;
         EX2MEM.isNop = 1;
+        EX2MEM.write_dest = 0;
+        EX2MEM.command = "NOP";
+        EX2MEM.tmp_rt = 0;
+        EX2MEM.func = 0;
+        return ;
     }
     int i;
     for(i=0; i<32; i++)
@@ -52,7 +57,6 @@ void implementJ()
         printf("JAL!!!\n");
         EX2MEM.addr = ((ID2EX.addr+4+pc) & 0xf0000000) | (ID2EX.immediate <<2);
         //pc = ID2EX.addr;
-
     }
 }
 void implementR()
@@ -509,7 +513,8 @@ void err_processing(int errtype)
 }
 void branch_forward_detect()
 {
-    if(EX2MEM.addr != ID2EX.addr)
+    if( ID2EX.opcode == bne ||ID2EX.opcode == beq || ID2EX.opcode == bgtz)
+    if(EX2MEM.addr != ID2EX.addr && EX2MEM.opcode >=8 &&EX2MEM.opcode <32)
     {
          if(EX2MEM.write_dest == ID2EX.rs && EX2MEM.write_dest !=0)
         {printf("%s\n",EX2MEM.command);

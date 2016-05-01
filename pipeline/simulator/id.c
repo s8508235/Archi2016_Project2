@@ -2,7 +2,6 @@
 #include "id.h"
 void ID()
 {
-    ID2EX.isStall = 0;
     ID2EX.need_forward = 0;
     ID2EX.addr  =IF2ID.pc;
     op_num = 0;
@@ -16,70 +15,75 @@ void ID()
         else if(EX2MEM.need_forward ==2)
         ID2EX.tmp_rt = EX2MEM.ALUout;
         ID2EX.need_forward = EX2MEM.need_forward;
+        EX2MEM.need_forward = 0;
+        ID2EX.isStall= 0;
         return ;
     }
-    ID2EX.instruction_op =IF2ID.instruction_op ;
-    for(i=0;i<6;i++)
+    if(ID2EX.isStall == 0)
     {
-        op_num  = op_num<< 1 ;
-        op_num += IF2ID.instrcution[i];
+        ID2EX.instruction_op =IF2ID.instruction_op ;
+        for(i=0;i<6;i++)
+        {
+            op_num  = op_num<< 1 ;
+            op_num += IF2ID.instrcution[i];
+        }
+        rs = 0,rt = 0,imm = 0,rd = 0,sht = 0,func = 0;
+        for(i=6;i<11;i++)
+        {
+            rs = rs <<1;
+            rs +=IF2ID.instrcution[i];
+        }
+        for(i=11;i<16;i++)
+        {
+            rt = rt<<1;
+            rt +=IF2ID.instrcution[i];
+        }
+        for(i=16;i<21;i++)
+        {
+            rd = rd<<1;
+            rd +=IF2ID.instrcution[i];
+        }
+        for(i=21;i<26;i++)
+        {
+            sht = sht<<1;
+            sht += IF2ID.instrcution[i];
+        }
+        for(i=26;i<32;i++)
+        {
+            func = func <<1;
+            func+= IF2ID.instrcution[i];
+        }
+        for(i=16;i<32;i++)
+        {
+            imm = imm<<1;
+            imm +=IF2ID.instrcution[i];
+        }
+        ID2EX.rs = rs;
+        ID2EX.rt = rt;
+        if(op_num == 0)
+        {
+            instruction_R();
+        }
+        else if(op_num==2 || op_num==3)
+        {
+            instruction_J();
+        }
+        else if(op_num ==63)
+        {
+            fclose(err);
+            end_program = 1;
+            ID2EX.command = "HALT";
+        }
+        else
+        {
+            instruction_I();
+        }
     }
-    rs = 0,rt = 0,imm = 0,rd = 0,sht = 0,func = 0;
-    for(i=6;i<11;i++)
-    {
-        rs = rs <<1;
-        rs +=IF2ID.instrcution[i];
-    }
-    for(i=11;i<16;i++)
-    {
-        rt = rt<<1;
-        rt +=IF2ID.instrcution[i];
-    }
-    for(i=16;i<21;i++)
-    {
-        rd = rd<<1;
-        rd +=IF2ID.instrcution[i];
-    }
-    for(i=21;i<26;i++)
-    {
-        sht = sht<<1;
-        sht += IF2ID.instrcution[i];
-    }
-    for(i=26;i<32;i++)
-    {
-        func = func <<1;
-        func+= IF2ID.instrcution[i];
-    }
-    for(i=16;i<32;i++)
-    {
-        imm = imm<<1;
-        imm +=IF2ID.instrcution[i];
-    }
-    ID2EX.rs = rs;
-    ID2EX.rt = rt;
-    if(op_num == 0)
-    {
-        instruction_R();
-    }
-    else if(op_num==2 || op_num==3)
-    {
-        instruction_J();
-    }
-    else if(op_num ==63)
-    {
-        fclose(err);
-        end_program = 1;
-        ID2EX.command = "HALT";
-    }
-    else
-    {
-        instruction_I();
-    }
-    printf("%s\n",ID2EX.command);
-    ID2EX.stop = end_program;
-
+    ID2EX.isStall = 0;
     branch_stall_detect();
     stall_detect();
+    printf("%s\n",ID2EX.command);
+    ID2EX.stop = end_program;
 }
 void instruction_R()
 {
@@ -259,23 +263,37 @@ void instruction_J()
 }
 void branch_stall_detect()
 {
-    if(op_num >=0 && op_num <=37)
-        if(EX2MEM.write_dest != 0)
-        if(EX2MEM.write_dest == rs || EX2MEM.write_dest ==rt)
+    if(EX2MEM.write_dest !=0)
+    {
+        if(op_num >0 && op_num <=37)
         {
-            printf("branch stall\n");
-            ID2EX.isStall = 1;
+            if(EX2MEM.write_dest == rs || EX2MEM.write_dest ==rt)
+            {
+                printf("branch stall\n");
+                ID2EX.isStall = 1;
+            }
         }
+        else if(op_num ==0)
+        {printf("%s %s ",ID2EX.command,EX2MEM.command);
+            printf("%s\n",MEM2WB.command);
+            if(EX2MEM.write_dest == rs || EX2MEM.write_dest == rt ||EX2MEM.write_dest == rd )
+            {
+                ID2EX.isStall = 1;
+                printf("stall!!\n");
+            }
+        }
+    }
+
 }
 void stall_detect()
 {
     if(op_num ==0)
-    {
+    {printf("%s: %d\n",MEM2WB.command,MEM2WB.write_dest);
         if(MEM2WB.write_dest !=0)
-        if(MEM2WB.write_dest == rs || MEM2WB.write_dest == rt )
+        if(MEM2WB.write_dest == rs || MEM2WB.write_dest == rt || MEM2WB.write_dest == rd)
         {
             ID2EX.isStall = 1;
-            printf("stall!!\n");
+            printf("stall!!???\n");
         }
     }
 }
