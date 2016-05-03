@@ -7,7 +7,6 @@ typedef struct IF_ID
     unsigned instrcution[32];
     unsigned int opcode;
     unsigned int instruction_op;
-    int isFlush;
 }IF_ID;
 extern IF_ID IF2ID;
 IF_ID IF2ID;
@@ -23,7 +22,6 @@ typedef struct ID_EX
     unsigned int tmp_rt;
     unsigned int sht;
     unsigned int func;
-    int ctrl;
     unsigned int instruction_op;
     char* command;
     int isNop;

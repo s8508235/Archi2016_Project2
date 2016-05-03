@@ -12,6 +12,13 @@ void ID()
         ID2EX.opcode = 0;
         ID2EX.isNop = 1;
         ID2EX.command = "NOP";
+        ID2EX.instruction_op  = 0;
+        ID2EX.mem_read = 0;
+        ID2EX.tmp_rs = 0;
+        ID2EX.tmp_rt = 0;
+        ID2EX.rs = 0;
+        ID2EX.rt = 0;
+        ID2EX.rd = 0;
     }
     ID2EX.isFlush = 0;
     end_program = 0;
@@ -177,7 +184,18 @@ void instruction_R()
     else if (func == sll)
     {
         ID2EX.command = "SLL";
-        if((ID2EX.instruction_op & 0b1111110000011111111111111111111 )== 0){
+        int x,flag = 0;
+        for(x= 0;x<32;x++)
+        {
+            if((x>=0 && x<=5)|| x>= 10)
+                if(IF2ID.instrcution[x] ==1)
+                {
+                    flag = 1;
+                    break;
+                }
+        }
+        if(flag ==0)
+        {
             ID2EX.isNop = 1;
             ID2EX.command ="NOP";
             printf("match nop\n");

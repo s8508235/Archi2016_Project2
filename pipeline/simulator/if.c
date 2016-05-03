@@ -16,11 +16,6 @@ void IF()
         if(ID2EX.isStall ==0 && ID2EX.isFlush ==0)
             IF2ID.pc +=4;
         else printf("stop!!!!!\n");
-        if(ID2EX.isFlush == 1)
-        {
-            for(i=0;i<32;i++)
-                IF2ID.instrcution[i] = 0;
-        }
         int op_num = 0;
         for(i=0;i<6;i++)
         {
@@ -33,6 +28,11 @@ void IF()
         {
             in_fetch  = in_fetch<< 1 ;
             in_fetch += IF2ID.instrcution[i];
+        }
+        if(ID2EX.isFlush == 1)
+        {
+            for(i=0;i<32;i++)
+                IF2ID.instrcution[i] = 0;
         }
         IF2ID.instruction_op = in_fetch;
 }

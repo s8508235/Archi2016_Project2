@@ -6,14 +6,12 @@ void init_buffer()
     memset(IF2ID.instrcution,0,sizeof(IF2ID.instrcution));
     IF2ID.opcode = 0;
     IF2ID.instruction_op = 0;
-    IF2ID.isFlush = 0;
 
     ID2EX.rs = 0;
     ID2EX.rt = 0;
     ID2EX.rd = 0;
     ID2EX.sht = 0;
     ID2EX.func = 0;
-    ID2EX.ctrl = 0;
     ID2EX.immediate = 0;
     ID2EX.addr = 0;
     ID2EX.tmp_rs = 0;
