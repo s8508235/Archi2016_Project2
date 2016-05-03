@@ -1,5 +1,7 @@
 #include "stdio.h"
 #include "id.h"
+int prev_tmprs;
+int prev_tmprt;
 void ID()
 {
     ID2EX.forward_mess = 0;
@@ -86,7 +88,18 @@ void ID()
             instruction_I();
         }
     }
-    else printf("no reading\n");
+    else
+    {
+    if(tmp_wb.write_dest == ID2EX.rs&& ID2EX.rs!=0)
+        ID2EX.tmp_rs = tmp_wb.ALUout;
+    else
+        ID2EX.tmp_rs = reg[rs];
+    if(tmp_wb.write_dest == ID2EX.rt&& ID2EX.rt!=0)
+        ID2EX.tmp_rt = tmp_wb.ALUout;
+    else    ID2EX.tmp_rt = reg[rt];
+        printf("%d %d\n",ID2EX.tmp_rs,ID2EX.tmp_rt);
+        printf("no reading\n");
+    }
     prediction();
     ID2EX.isStall = 0;
     stall_detect();
@@ -104,7 +117,7 @@ if(ID2EX.isStall == 0)
         }
     }
     else if(strcmp(ID2EX.command,"BEQ") ==0)
-    {printf("compare:%d %d\n",reg[rs],reg[rt]);
+    {printf("compare:%d %d\n",ID2EX.tmp_rs,ID2EX.tmp_rt);
         if(ID2EX.tmp_rs == ID2EX.tmp_rt)
         {
             ID2EX.isFlush = 1;
@@ -140,10 +153,10 @@ void instruction_R()
     ID2EX.rt = rt;
     ID2EX.rd = rd;
     ID2EX.sht = sht;
-    if(tmp_wb.write_dest == rs)
+    if(tmp_wb.write_dest == rs && rs !=0)
         ID2EX.tmp_rs = tmp_wb.ALUout;
     else ID2EX.tmp_rs = reg[rs];
-    if(tmp_wb.write_dest ==rt)
+    if(tmp_wb.write_dest ==rt && rt!=0)
         ID2EX.tmp_rt = tmp_wb.ALUout;
     else ID2EX.tmp_rt = reg[rt];
     ID2EX.func = func;
@@ -151,7 +164,6 @@ void instruction_R()
     if(func == add)
     {
         ID2EX.command = "ADD";
-        ID2EX.RegWrite = 1;
     }
     else if (func == addu)
     {
@@ -226,12 +238,14 @@ void instruction_I()
     ID2EX.rs = rs;
     ID2EX.rt = rt;
     ID2EX.isNop = 0;
-    if(tmp_wb.write_dest == rs)
+    if(tmp_wb.write_dest == rs && rs!=0)
         ID2EX.tmp_rs = tmp_wb.ALUout;
     else ID2EX.tmp_rs = reg[rs];
-    if(tmp_wb.write_dest ==rt)
+    if(tmp_wb.write_dest ==rt && rt!=0)
+    {
         ID2EX.tmp_rt = tmp_wb.ALUout;
-    else ID2EX.tmp_rt = reg[rs];
+    }
+    else ID2EX.tmp_rt = reg[rt];
     if(op_num == andi || op_num == ori || op_num == nori)
     {
         ID2EX.immediate = imm;

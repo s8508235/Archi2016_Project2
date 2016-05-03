@@ -4,16 +4,16 @@ int mask_15 = 0x8000;
 void EX()
 {
     EX2MEM.forward_mess = 0;
-    if(tmp_wb.write_dest == ID2EX.rs)
+    printf("%d %d\nchange is not :%d %d\n",ID2EX.rs,ID2EX.rt,ID2EX.tmp_rs,ID2EX.tmp_rt);
+    if(tmp_wb.write_dest == ID2EX.rs && ID2EX.rs!=0)
         ID2EX.tmp_rs = tmp_wb.ALUout;
-    else if(written_in_this_cycle.write_dest == ID2EX.rs)
+    else if(written_in_this_cycle.write_dest == ID2EX.rs && ID2EX.rs!=0)
         ID2EX.tmp_rs = written_in_this_cycle.ALUout;
-    if(tmp_wb.write_dest == ID2EX.rt)
+    if(tmp_wb.write_dest == ID2EX.rt&& ID2EX.rt!=0)
         ID2EX.tmp_rt = tmp_wb.ALUout;
-    else if(written_in_this_cycle.write_dest ==ID2EX.rt)
-    {
+    else if(written_in_this_cycle.write_dest ==ID2EX.rt && ID2EX.rt!=0)
         ID2EX.tmp_rt = written_in_this_cycle.ALUout;
-    }
+    printf("change is not :%d %d\n",ID2EX.tmp_rs,ID2EX.tmp_rt);
     if(EX2MEM.go_forward ==1)
     {
         printf("~~~~~~~go 1\n");
@@ -121,6 +121,7 @@ void implementR()
         EX2MEM.ALUout = ID2EX.tmp_rs - ID2EX.tmp_rt;
         EX2MEM.write_dest = ID2EX.rd;
         sRd = (EX2MEM.ALUout & mask_31)?1:0;
+        printf("SSSSSSSSSSSSSSSSSSSSS:%d %d %d\n",ID2EX.tmp_rs,ID2EX.tmp_rt,EX2MEM.ALUout);
         if(sRs ==sRt && sRs !=sRd)
         {
             EX2MEM.num_error = 1;
@@ -175,6 +176,7 @@ void implementR()
     {
         EX2MEM.ALUout = ID2EX.tmp_rt >> ID2EX.sht;
         EX2MEM.write_dest = ID2EX.rd;
+        printf("SRRRRRRRRRRRRRRRRRRRRRRRRRRLLLLLLLLLLLLLLL:%d\n",EX2MEM.ALUout);
     }
     else if (ID2EX.func == sra)
     {
