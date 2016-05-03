@@ -62,4 +62,5 @@ extern int cycle;
 int cycle;
 extern int end_program;
 int end_program;
+void err_processing(int errtype);
 #endif // DEFINES_H_INCLUDED

@@ -1,27 +1,55 @@
 #include "wb.h"
 void WB()
 {
-    if(MEM2WB.opcode == halt)
+    if(MEM2WB.jal_out == 1)
     {
+        currpc = MEM2WB.ALUout;
+    }
+printf("------------------------cycle:%d-------------------- currpc:%d\n",cycle,currpc);
+printf("%d %d %08X\n",tmp_wb.RegWrite ,tmp_wb.write_dest,tmp_wb.ALUout);
+    if(tmp_wb.RegWrite ==1)
+    {
+        if(tmp_wb.opcode == halt)
+        {
+            tmp_wb.stop = 1;
+        }
+        else if(tmp_wb.write_dest !=0)
+        {
+            reg[tmp_wb.write_dest] = tmp_wb.ALUout;
+            printf("-------------%d :%s write %08x in wb %d--------------\n",cycle,tmp_wb.command,tmp_wb.ALUout,tmp_wb.write_dest);
+        }
+    }
+    if(MEM2WB.write_dest ==0 && MEM2WB.isNop == 0)
+    {
+        err_processing(Writeto0);
+    }
+    written_in_this_cycle.opcode = tmp_wb.opcode;
+    written_in_this_cycle.addr = tmp_wb.addr;
+    written_in_this_cycle.write_dest = tmp_wb.write_dest;
+    written_in_this_cycle.ALUout = tmp_wb.ALUout;
+    written_in_this_cycle.instruction_op = tmp_wb.instruction_op;
+    written_in_this_cycle.command = tmp_wb.command;
+    written_in_this_cycle.isNop = tmp_wb.isNop;
+    written_in_this_cycle.stop = tmp_wb.stop ;
+    written_in_this_cycle.num_error = tmp_wb.num_error;
+    written_in_this_cycle.mem_error = tmp_wb.mem_error;
+    written_in_this_cycle.data_miss = tmp_wb.data_miss;
+    written_in_this_cycle.mem_read = tmp_wb.mem_read;
+    written_in_this_cycle.mem_write = tmp_wb.mem_write;
+    written_in_this_cycle.RegWrite = tmp_wb.RegWrite;
 
-    }
-    else if(MEM2WB.write_dest !=0)
-    {
-        reg[tmp_wb.write_dest] = tmp_wb.ALUout;
-        printf("%s write in wb %d\n",tmp_wb.command,tmp_wb.write_dest);
-    }
-    else if(MEM2WB.write_dest ==0/* && strcmp(tmp_wb.command,"BEQ")!=0 && strcmp(tmp_wb.command,"BNE")!=0 && strcmp(tmp_wb.command,"BGTZ")!=0*/)
-    {
-        if(tmp_wb.opcode !=bgtz && tmp_wb.opcode !=bne && tmp_wb.opcode !=beq && tmp_wb.isNop ==0)
-        fprintf(err, "In cycle %d: Write $0 Error\n", cycle);
-    }
-    tmp_wb.opcode = EX2MEM.opcode;
-    tmp_wb.addr = EX2MEM.addr + 4;
+    tmp_wb.opcode = MEM2WB.opcode;
+    tmp_wb.addr = MEM2WB.addr;
     tmp_wb.write_dest = MEM2WB.write_dest;
     tmp_wb.ALUout = MEM2WB.ALUout;
-    tmp_wb.instruction_op = EX2MEM.instruction_op;
-    tmp_wb.command = EX2MEM.command;
-    tmp_wb.isNop = EX2MEM.isNop;
-    tmp_wb.stop = EX2MEM.stop;
-    tmp_wb.isStall = 0;
+    tmp_wb.instruction_op = MEM2WB.instruction_op;
+    tmp_wb.command = MEM2WB.command;
+    tmp_wb.isNop = MEM2WB.isNop;
+    tmp_wb.stop = MEM2WB.stop ;
+    tmp_wb.num_error = MEM2WB.num_error;
+    tmp_wb.mem_error = MEM2WB.mem_error;
+    tmp_wb.data_miss = MEM2WB.data_miss;
+    tmp_wb.mem_read = MEM2WB.mem_read;
+    tmp_wb.mem_write = MEM2WB.mem_write;
+    tmp_wb.RegWrite = MEM2WB.RegWrite;
 }
