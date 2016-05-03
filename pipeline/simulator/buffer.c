@@ -26,6 +26,8 @@ void init_buffer()
     ID2EX.go_forward = 0;
     ID2EX.forward_mess = 0;
     ID2EX.isFlush = 0;
+    ID2EX.jal_tmp = 0;
+    ID2EX.C = 0;
 
     EX2MEM.ALUout = 0;
     memset(EX2MEM.tmp_dmem,0,sizeof(EX2MEM.tmp_dmem));
@@ -48,6 +50,7 @@ void init_buffer()
     EX2MEM.go_forward = 0;
     EX2MEM.forward_mess = 0;
     EX2MEM.isFlush = 0;
+    EX2MEM.forward_pos = 0;
 
     MEM2WB.ALUout = 0;
     MEM2WB.jal_out = 0;

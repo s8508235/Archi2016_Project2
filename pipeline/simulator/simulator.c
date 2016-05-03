@@ -120,8 +120,8 @@ int main()
         }
         fprintf(out,"PC: 0x%08X\n",pc+currpc);
         fprintf(out,"IF: 0x%08X",IF2ID.instruction_op);
-        if(ID2EX.isFlush ==1) fprintf(out," to_be_flushed");
-        else if(ID2EX.isStall ==1) fprintf(out," to_be_stalled");
+        if(ID2EX.isStall ==1) fprintf(out," to_be_stalled");
+        else if(ID2EX.isFlush ==1) fprintf(out," to_be_flushed");
         fprintf(out,"\n");
         fprintf(out,"ID: %s",(/*(ID2EX.command =="SLL"  && ID2EX.instruction_op  ==0x00000000 )|| */ID2EX.isNop ==1)?"NOP":ID2EX.command);
         if(ID2EX.isStall ==1) fprintf(out," to_be_stalled");
@@ -129,8 +129,8 @@ int main()
         else if(ID2EX.forward_mess ==2) fprintf(out," fwd_EX-DM_rt_$%d",ID2EX.rt);
         fprintf(out,"\n");
         fprintf(out,"EX: %s",(/*(EX2MEM.command =="SLL" && EX2MEM.instruction_op ==0x00000000 )||*/ EX2MEM.isNop ==1)?"NOP":EX2MEM.command);
-        if(EX2MEM.forward_mess ==1) fprintf(out," fwd_EX-DM_rs_$%d",EX2MEM.write_dest);
-        else if(EX2MEM.forward_mess ==2) fprintf(out," fwd_EX-DM_rt_$%d",EX2MEM.write_dest);
+        if(EX2MEM.forward_mess ==1) fprintf(out," fwd_EX-DM_rs_$%d",EX2MEM.forward_pos);
+        else if(EX2MEM.forward_mess ==2) fprintf(out," fwd_EX-DM_rt_$%d",EX2MEM.forward_pos);
         fprintf(out,"\n");
         fprintf(out,"DM: %s\n",(/*(MEM2WB.command =="SLL" && MEM2WB.instruction_op ==0x00000000 )|| */MEM2WB.isNop ==1)?"NOP":MEM2WB.command);
         fprintf(out,"WB: %s",(/*(wb_command =="SLL" && wb_data ==0x00000000)||*/tmp_wb.isNop ==1)?"NOP":tmp_wb.command);

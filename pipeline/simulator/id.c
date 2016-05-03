@@ -7,6 +7,7 @@ void ID()
     ID2EX.forward_mess = 0;
     ID2EX.addr  =IF2ID.pc;
     op_num = 0;
+    ID2EX.jal_tmp = 0;
     if(ID2EX.isFlush ==1)
     {
         //insert nop
@@ -21,6 +22,7 @@ void ID()
         ID2EX.rs = 0;
         ID2EX.rt = 0;
         ID2EX.rd = 0;
+        ID2EX.immediate = 0;
     }
     ID2EX.isFlush = 0;
     end_program = 0;
@@ -33,7 +35,7 @@ void ID()
             op_num  = op_num<< 1 ;
             op_num += IF2ID.instrcution[i];
         }
-        rs = 0,rt = 0,imm = 0,rd = 0,sht = 0,func = 0;
+        rs = 0,rt = 0,imm = 0,rd = 0,sht = 0,func = 0,C = 0;
         for(i=6; i<11; i++)
         {
             rs = rs <<1;
@@ -64,11 +66,19 @@ void ID()
             imm = imm<<1;
             imm +=IF2ID.instrcution[i];
         }
+        for(i=6;i<32;i++)
+        {
+            C = C<<1;
+            C +=IF2ID.instrcution[i];
+        }
         ID2EX.rs = rs;
         ID2EX.rt = rt;
         ID2EX.RegWrite = 1;
         ID2EX.tmp_rs = 0;
         ID2EX.tmp_rt = 0;
+        ID2EX.jal_tmp = 0;
+        ID2EX.immediate = 0;
+        ID2EX.C = C;
         if(op_num == 0)
         {
             instruction_R();
@@ -246,6 +256,7 @@ void instruction_I()
         ID2EX.tmp_rt = tmp_wb.ALUout;
     }
     else ID2EX.tmp_rt = reg[rt];
+
     if(op_num == andi || op_num == ori || op_num == nori)
     {
         ID2EX.immediate = imm;
@@ -353,14 +364,16 @@ void instruction_J()
     ID2EX.isNop = 0;
     if(op_num == j)
     {
-        ID2EX.addr = ((pc + IF2ID.pc + 4) & 0x80000000 )| (4 * imm);
+       // ID2EX.addr = ((pc + IF2ID.pc + 4) & 0x80000000 )| (4 * imm);
         ID2EX.command = "J";
+        printf("JOOOOOOOOOOOOOOOOOO\n");
         ID2EX.RegWrite = 0;
     }
     else if(op_num == jal)
     {
-        ID2EX.addr = ((pc + IF2ID.pc + 4) & 0x80000000 )| (4 * imm);
+       // ID2EX.addr = ((pc + IF2ID.pc + 4) & 0x80000000 )| (4 * imm);
         ID2EX.command = "JAL";
+        ID2EX.jal_tmp = pc + IF2ID.pc;
     }
 
 }/*
@@ -425,7 +438,7 @@ void prediction()
                 }
             }
         }
-        if(((EX2MEM.opcode == R && EX2MEM.func != 8) || (EX2MEM.opcode >= 8 && EX2MEM.opcode <= 15) || (EX2MEM.opcode >= 40 && EX2MEM.opcode <= 43) || (EX2MEM.opcode == jal)))
+        if(((EX2MEM.opcode == jal)||(EX2MEM.opcode == R && EX2MEM.func != 8) || (EX2MEM.opcode >= 8 && EX2MEM.opcode <= 15)))
             EX2MEM.can_forward = 1;
     }/*
     if(EX2MEM.forward_mess >0)
@@ -486,7 +499,7 @@ void prediction()
                 }
             }
         }
-        if((MEM2WB.opcode == R && MEM2WB.func != 8) || (MEM2WB.opcode >= 8 && MEM2WB.opcode <= 15) || (MEM2WB.opcode >= 40 && MEM2WB.opcode <= 43) || (MEM2WB.opcode == jal))
+        if((MEM2WB.opcode == R && MEM2WB.func != 8) || (MEM2WB.opcode >= 8 && MEM2WB.opcode <= 15) || (MEM2WB.opcode == jal))
             MEM2WB.can_forward = 1;
     }
    // printf("prediction!!!!!!!!!!!!\n%d %d\n",EX2MEM.can_forward,MEM2WB.can_forward);
@@ -508,6 +521,7 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);
             if(EX2MEM.can_forward == 1 && ID2EX.opcode !=7 && ID2EX.opcode !=0)
             {printf("exmem can forward(exclude bgtz)\n");
                 EX2MEM.go_forward = 1;
+                EX2MEM.forward_pos = ID2EX.rs;
                 ID2EX.isStall = 0;
             }
             else
@@ -534,6 +548,7 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);
             if(EX2MEM.can_forward == 1)
             {printf("exmem can forward\n");
                 EX2MEM.go_forward = 2;
+                EX2MEM.forward_pos = ID2EX.rt;
                 ID2EX.isStall = 0;
             }
             else
@@ -554,6 +569,7 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);
                 if(EX2MEM.can_forward ==1 && ID2EX.opcode != bne && ID2EX.opcode != beq)
                 {printf("exmem can forward\n");
                     EX2MEM.go_forward = 1;
+                    EX2MEM.forward_pos = ID2EX.rs;
                     ID2EX.isStall = 0;
                 }
                 else
@@ -580,10 +596,10 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);
                 ID2EX.isStall = 0;
             }
         }
-        else // double data hazard
+        else
         {printf("rs != rt\n");
             if((flag_rs_exmem && flag_rt_memwb) || (flag_rs_memwb && flag_rt_exmem))
-            {
+            {// double data hazard
                 ID2EX.isStall = 1;
             }
             else if (flag_rs_exmem || flag_rt_exmem)
@@ -593,10 +609,12 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);
                     if(flag_rs_exmem)
                     {printf("rs exmem\n");
                         EX2MEM.go_forward = 1;
+                        EX2MEM.forward_pos = ID2EX.rs;
                     }
                     else
                     {printf("rt exmem\n");
                         EX2MEM.go_forward = 2;
+                        EX2MEM.forward_pos = ID2EX.rt;
                     }
                     ID2EX.isStall = 0;
                 }

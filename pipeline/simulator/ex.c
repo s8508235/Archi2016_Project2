@@ -77,18 +77,24 @@ void EX()
         implementI();
     }
     EX2MEM.stop = ID2EX.stop;
+    printf("**********************ex write:%d\n",EX2MEM.write_dest);
 }
 void implementJ()
 {
+    int x= ID2EX.C;
+    x = x<<2;
     if(ID2EX.opcode == j)
     {
-        printf("J!!!\n");
-        EX2MEM.addr = ((ID2EX.addr+4) & 0xf0000000) | (ID2EX.immediate <<2);
+        printf("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ!!!\n");
+        currpc = (((ID2EX.addr) & 0xf0000000) | (x )) - pc;
+        printf("%d %d %d\n",currpc,pc ,currpc+pc);
     }
     else if(ID2EX.opcode == jal)
     {
         printf("JAL!!!\n");
-        EX2MEM.addr = ((ID2EX.addr+4+pc) & 0xf0000000) | (ID2EX.immediate <<2);
+        currpc = (((ID2EX.addr+pc) & 0xf0000000) | (x)) - pc;
+        EX2MEM.ALUout = ID2EX.jal_tmp;
+        EX2MEM.write_dest = 31;
         //pc = ID2EX.addr;
     }
 }

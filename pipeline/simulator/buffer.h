@@ -33,6 +33,8 @@ typedef struct ID_EX
     int go_forward;
     int forward_mess;
     int isFlush;
+    int jal_tmp;
+    int C;
 }ID_EX;
 extern ID_EX ID2EX;
 ID_EX ID2EX;
@@ -61,6 +63,7 @@ typedef struct EX_MEM
     int go_forward;
     int forward_mess;
     int isFlush;
+    int forward_pos;
 }EX_MEM;
 extern EX_MEM EX2MEM;
 EX_MEM EX2MEM;

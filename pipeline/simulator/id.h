@@ -9,5 +9,5 @@ void instruction_I();
 void instruction_J();
 void stall_detect();
 void prediction();
-int rs,rt,imm,rd,op_num,sht,func;
+int rs,rt,imm,rd,op_num,sht,func,C;
 #endif // ID_H_INCLUDED
