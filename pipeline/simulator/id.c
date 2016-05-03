@@ -569,7 +569,7 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);
             {printf("rs exmem\n");
                 if(EX2MEM.can_forward ==1 && ID2EX.opcode != bne && ID2EX.opcode != beq)
                 {printf("exmem can forward\n");
-                    EX2MEM.go_forward = 1;
+                    EX2MEM.go_forward = 3;
                     EX2MEM.forward_pos = ID2EX.rs;
                     ID2EX.isStall = 0;
                 }
@@ -582,7 +582,7 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);
             {printf("rs memwb\n");
                 if(MEM2WB.can_forward ==1 && (ID2EX.opcode == bne || ID2EX.opcode == beq))
                 {/*do forward now and here*/printf("memwb can forward (bne/beq)&here\n");
-                    ID2EX.forward_mess = 1;
+                    ID2EX.forward_mess = 3;
                     ID2EX.tmp_rs = MEM2WB.ALUout;
                     ID2EX.tmp_rt = MEM2WB.ALUout;
                     ID2EX.isStall = 0;

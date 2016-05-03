@@ -32,6 +32,17 @@ void EX()
         printf("forward : %08X \n",MEM2WB.ALUout);
         ID2EX.isStall = 0;
     }
+    else if(EX2MEM.go_forward == 3)
+    {
+        EX2MEM.forward_mess = 3;
+        printf("~~~~~~~~~~go 3\n");
+        ID2EX.tmp_rs = MEM2WB.ALUout;
+        ID2EX.tmp_rt = MEM2WB.ALUout;
+        printf("%08X %08x\n",ID2EX.tmp_rs,ID2EX.tmp_rt);
+        printf("forward : %08X \n",MEM2WB.ALUout);
+        ID2EX.isStall = 0;
+    }
+
     if(ID2EX.isStall ==1)
     {
         printf("~~~~~~~~insert\n");
