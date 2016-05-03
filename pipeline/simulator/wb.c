@@ -19,7 +19,7 @@ printf("%d %d %08X\n",tmp_wb.RegWrite ,tmp_wb.write_dest,tmp_wb.ALUout);
             printf("-------------%d :%s write %08x in wb %d--------------\n",cycle,tmp_wb.command,tmp_wb.ALUout,tmp_wb.write_dest);
         }
     }
-    if(MEM2WB.write_dest ==0 && MEM2WB.isNop == 0)
+    if(MEM2WB.write_dest ==0 && MEM2WB.isNop == 0 && MEM2WB.RegWrite == 1 && strcmp(MEM2WB.command,"HALT")!=0)
     {
         err_processing(Writeto0);
     }

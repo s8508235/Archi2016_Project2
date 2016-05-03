@@ -12,8 +12,8 @@ FILE *iImageData,*dImageData;
 int main()
 {
     cycle = 0;
-    iImageData = fopen("open_testcase/error_3/iimage.bin","rb");//102062104_01 102062111 102062202_01
-    dImageData = fopen("open_testcase/error_3/dimage.bin","rb");//102070028_01
+    iImageData = fopen("iimage.bin","rb");//102062104_01 102062111 102062202_01
+    dImageData = fopen("dimage.bin","rb");//102070028_01
     int isize,dsize;
     fseek(iImageData,0,SEEK_END);
     isize = ftell(iImageData);

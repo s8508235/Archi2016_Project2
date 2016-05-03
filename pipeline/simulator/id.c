@@ -93,24 +93,26 @@ void ID()
     printf("stall & forward:%d %d~~~~~~~~~~~~~\n",ID2EX.isStall,EX2MEM.go_forward);
     ID2EX.stop = end_program;
     //judge flush
+if(ID2EX.isStall == 0)
+{
     if(strcmp(ID2EX.command,"BGTZ") ==0)
     {
-        int sRG = (reg[rs] & 0x80000000)?1:0;
+        int sRG = (ID2EX.tmp_rs & 0x80000000)?1:0;
         if(sRG == 0)
         {
             ID2EX.isFlush = 1;
         }
     }
     else if(strcmp(ID2EX.command,"BEQ") ==0)
-    {
-        if(reg[rs] == reg[rt])
+    {printf("compare:%d %d\n",reg[rs],reg[rt]);
+        if(ID2EX.tmp_rs == ID2EX.tmp_rt)
         {
             ID2EX.isFlush = 1;
         }
     }
     else if(strcmp(ID2EX.command,"BNE") ==0)
     {
-        if(reg[rs] !=reg[rt])
+        if(ID2EX.tmp_rs != ID2EX.tmp_rt)
         {
             ID2EX.isFlush = 1;
         }
@@ -127,6 +129,8 @@ void ID()
     {
         ID2EX.isFlush = 1;
     }
+
+}
     printf("************get %s numbers : %d %d %d %08X %08X\n",ID2EX.command,rs,rt,rd,ID2EX.tmp_rs,ID2EX.tmp_rt);
 }
 void instruction_R()
