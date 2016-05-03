@@ -3,7 +3,7 @@
 int prev_tmprs;
 int prev_tmprt;
 void ID()
-{
+{printf("currpc : %08X pc :%08X PC :%08X\n",currpc,pc ,currpc + pc);
     ID2EX.forward_mess = 0;
     ID2EX.addr  =IF2ID.pc;
     op_num = 0;
@@ -79,6 +79,7 @@ void ID()
         ID2EX.jal_tmp = 0;
         ID2EX.immediate = 0;
         ID2EX.C = C;
+        printf("init com\n");
         if(op_num == 0)
         {
             instruction_R();
@@ -116,8 +117,8 @@ void ID()
     printf("stall & forward:%d %d~~~~~~~~~~~~~\n",ID2EX.isStall,EX2MEM.go_forward);
     ID2EX.stop = end_program;
     //judge flush
-if(ID2EX.isStall == 0)
-{
+if(ID2EX.isStall == 0 && ID2EX.go_forward == 0 && EX2MEM.go_forward == 0)
+{printf("ready to flush!!!!!!!!!!!!!!!!!!\n");
     if(strcmp(ID2EX.command,"BGTZ") ==0)
     {
         int sRG = (ID2EX.tmp_rs & 0x80000000)?1:0;
@@ -154,7 +155,7 @@ if(ID2EX.isStall == 0)
     }
 
 }
-    printf("************get %s numbers : %d %d %d %08X %08X\n",ID2EX.command,rs,rt,rd,ID2EX.tmp_rs,ID2EX.tmp_rt);
+    printf("************get %s numbers : %d %d %d %08X %08X %08X\n",ID2EX.command,rs,rt,rd,ID2EX.tmp_rs,ID2EX.tmp_rt,ID2EX.immediate);
 }
 void instruction_R()
 {
@@ -513,7 +514,7 @@ printf("goto %d %d\n",EX2MEM.write_dest ,MEM2WB.write_dest);
 printf("can forward :%d %d\n",EX2MEM.can_forward,MEM2WB.can_forward);
 printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);
     ID2EX.go_forward = 0;/* 1 for rs 2 for rt*/
-
+    EX2MEM.go_forward = 0;
     if((ID2EX.opcode>=7 && ID2EX.opcode <=37 && ID2EX.opcode !=lui )|| (ID2EX.opcode==0 &&ID2EX.func == 8))
     {printf("I type or jr\n");
         if(flag_rs_exmem ==1 && flag_rt_exmem ==0)
@@ -537,7 +538,7 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);
                 ID2EX.tmp_rs = MEM2WB.ALUout;
                 ID2EX.isStall = 0;
             }
-            else ID2EX.isStall = 0;
+            else ID2EX.isStall = 1;
         }
         else ID2EX.isStall = 0;
     }

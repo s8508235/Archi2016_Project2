@@ -77,6 +77,7 @@ void EX()
         implementI();
     }
     EX2MEM.stop = ID2EX.stop;
+    printf("%08X \n",currpc + pc);
     printf("**********************ex write:%d\n",EX2MEM.write_dest);
 }
 void implementJ()
@@ -193,6 +194,7 @@ void implementR()
     }
     else if (ID2EX.func == jr)
     {
+        currpc = ID2EX.tmp_rs - pc -4;
         //  *pc = reg[rs]-unmod_pc-4 ;
     }
 }
@@ -267,12 +269,12 @@ void implementI()
             if(addr >=1023)
             {
                 EX2MEM.mem_error = 1;
-                err_processing(MemaddrOver);
+               // err_processing(MemaddrOver);
             }
             if(addr%2)
             {
                 EX2MEM.data_miss = 1;
-                err_processing(DataMis);
+              //  err_processing(DataMis);
             }
             end_program= 1;
             return ;
@@ -299,12 +301,12 @@ void implementI()
             if(addr >=1023)
             {
                 EX2MEM.mem_error = 1;
-                err_processing(MemaddrOver);
+              //  err_processing(MemaddrOver);
             }
             if(addr%2)
             {
                 EX2MEM.data_miss = 1;
-                err_processing(DataMis);
+             //   err_processing(DataMis);
             }
             end_program = 1;
             return ;
@@ -329,7 +331,7 @@ void implementI()
         if(addr >=1024)
         {
             EX2MEM.mem_error = 1;
-            err_processing(MemaddrOver);
+//            err_processing(MemaddrOver);
             end_program = 1;
             return ;
         }
@@ -354,7 +356,7 @@ void implementI()
         if(addr >=1024)
         {
             EX2MEM.mem_error = 1;
-            err_processing(MemaddrOver);
+//            err_processing(MemaddrOver);
             end_program = 1;
             return ;
         }
@@ -381,11 +383,11 @@ void implementI()
             if(addr >=1021)
             {
                 EX2MEM.mem_error = 1;
-                err_processing(MemaddrOver);
+//                err_processing(MemaddrOver);
             }
             if(addr%4)
             {
-                err_processing(DataMis);
+//                err_processing(DataMis);
                 EX2MEM.data_miss = 1;
             }
             end_program = 1;
@@ -429,12 +431,12 @@ void implementI()
             if(addr >=1023)
             {
                 EX2MEM.mem_error = 1;
-                err_processing(MemaddrOver);
+//                err_processing(MemaddrOver);
             }
             if(addr%2)
             {
                 EX2MEM.data_miss = 1;
-                err_processing(DataMis);
+//                err_processing(DataMis);
             }
             end_program = 1;
             return ;
@@ -474,7 +476,7 @@ void implementI()
         if(addr >=1024)
         {
             EX2MEM.mem_error = 1;
-            err_processing(MemaddrOver);
+//            err_processing(MemaddrOver);
             end_program = 1;
             return ;
         }
@@ -532,7 +534,7 @@ void implementI()
         {
             int x = ID2EX.immediate;
             x = x<<2 ;
-            currpc = ID2EX.addr + x - pc;
+            currpc = ID2EX.addr + x;
             //      *pc +=x;
         }
         if(ID2EX.addr >=1020)
@@ -541,8 +543,8 @@ void implementI()
             EX2MEM.mem_error = 1;
             EX2MEM.data_miss = 1;
             err_processing(NumOver);
-            err_processing(MemaddrOver);
-            err_processing(DataMis);
+//            err_processing(MemaddrOver);
+//            err_processing(DataMis);
             end_program  = 1;
         }
     }
@@ -553,7 +555,7 @@ void implementI()
         {
             int x = ID2EX.immediate;
             x = x<<2 ;
-            currpc = ID2EX.addr + x - pc;
+            currpc = ID2EX.addr + x;
             //     *pc =*pc + x;
         }
         if(ID2EX.addr >=1020)
@@ -562,8 +564,8 @@ void implementI()
             EX2MEM.mem_error = 1;
             EX2MEM.data_miss = 1;
             err_processing(NumOver);
-            err_processing(MemaddrOver);
-            err_processing(DataMis);
+//            err_processing(MemaddrOver);
+//            err_processing(DataMis);
             end_program  = 1;
         }
     }
