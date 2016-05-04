@@ -18,9 +18,6 @@ void DM()
     MEM2WB.mem_read = EX2MEM.mem_read;
     MEM2WB.mem_write = EX2MEM.mem_write;
     MEM2WB.RegWrite = EX2MEM.RegWrite;
-    if(MEM2WB.mem_write == 1)
- //   printf("write::%08X\n",MEM2WB.mem_addr);
-  //  printf("%s %d %d %d\n",MEM2WB.command,MEM2WB.mem_write,MEM2WB.mem_read,MEM2WB.RegWrite);
         if(MEM2WB.mem_error ==1)
         {
             err_processing(MemaddrOver);
