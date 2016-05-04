@@ -6,8 +6,7 @@ void IF()
         k = IF2ID.pc / 4;
         if(k < 0) {
             IF2ID.pc += 4;
-            printf("minussssssssssssssss\n");
-            return;
+            return ;
         }
         for(i=0;i<32;i++)
         {

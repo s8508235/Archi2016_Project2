@@ -51,7 +51,8 @@ unsigned reg[32];
 int mask[8];
 extern unsigned int Imem[8192];
 extern unsigned int Dmem[8192];
-unsigned int Imem[8192],Dmem[8192];
+unsigned int Imem[8192];
+unsigned int Dmem[8192];
 extern FILE *out;
 extern FILE *err;
 FILE *out,*err;
@@ -63,4 +64,5 @@ int cycle;
 extern int end_program;
 int end_program;
 void err_processing(int errtype);
+unsigned int num_I,num_D;
 #endif // DEFINES_H_INCLUDED

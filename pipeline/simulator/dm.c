@@ -5,6 +5,7 @@ void DM()
     MEM2WB.jal_out = 0;
     MEM2WB.opcode = EX2MEM.opcode;
     MEM2WB.addr = EX2MEM.addr;
+    MEM2WB.mem_addr = EX2MEM.mem_addr;
     MEM2WB.func = EX2MEM.func;
     MEM2WB.instruction_op = EX2MEM.instruction_op;
     MEM2WB.command = EX2MEM.command;
@@ -17,6 +18,9 @@ void DM()
     MEM2WB.mem_read = EX2MEM.mem_read;
     MEM2WB.mem_write = EX2MEM.mem_write;
     MEM2WB.RegWrite = EX2MEM.RegWrite;
+    if(MEM2WB.mem_write == 1)
+    printf("write::%08X\n",MEM2WB.mem_addr);
+    printf("%s %d %d %d\n",MEM2WB.command,MEM2WB.mem_write,MEM2WB.mem_read,MEM2WB.RegWrite);
         if(MEM2WB.mem_error ==1)
         {
             err_processing(MemaddrOver);
@@ -27,100 +31,114 @@ void DM()
             err_processing(DataMis);
             tmp_wb.stop = 1;
         }
-        if(EX2MEM.RegWrite ==1)
-        {printf("RRRRRRRRRRRRRRRRRRRRRRRRRRR %d\n",EX2MEM.ALUout);
-            MEM2WB.ALUout = EX2MEM.ALUout;
-        }
-    if(EX2MEM.mem_read == 1)
+
+            int x,y;
+            printf("Dmem:\n");//num_D*4 bytes => 32*num_D bits
+            for(x=0;x<num_D;x++)
+            {
+                int w = 0;
+                for(y=0;y<32;y++)
+                {
+               //     printf("%d ",Dmem[x*32+y]);
+                    w  = w<<1;
+                    w+=Dmem[x*32+y];
+                }
+                printf("%08X",w);
+                printf("\n");
+            }
+    if(MEM2WB.RegWrite ==1 )
     {
-        if(EX2MEM.opcode == lw)
+        MEM2WB.ALUout = EX2MEM.ALUout;
+    }
+    if(MEM2WB.mem_read == 1 && (MEM2WB.opcode==0x23 || MEM2WB.opcode==0x21 || MEM2WB.opcode==0x25 || MEM2WB.opcode==0x20 || MEM2WB.opcode==0x24))
+    {
+        if(MEM2WB.opcode == lw)
         {
             MEM2WB.ALUout = 0;
             int i;
             for(i=0; i<32; i++)
             {
                 MEM2WB.ALUout =  MEM2WB.ALUout <<1;
-                MEM2WB.ALUout += Dmem[MEM2WB.addr*8+i];
+                MEM2WB.ALUout += Dmem[MEM2WB.mem_addr*8+i];
             }
-            printf("%d+++++++++++++determine lw's value: %08X\n",EX2MEM.write_dest,MEM2WB.ALUout);
+            printf("%d+++++++++++++determine lw's value: %08X\n",MEM2WB.write_dest,MEM2WB.ALUout);
         }
-        else if(EX2MEM.opcode == lh)
+        else if(MEM2WB.opcode == lh)
         {
-            MEM2WB.opcode = EX2MEM.opcode;
             MEM2WB.ALUout = 0;
             int i;
             for(i=0; i<16; i++)
             {
                 MEM2WB.ALUout =  MEM2WB.ALUout <<1;
-                MEM2WB.ALUout += Dmem[EX2MEM.addr*8+i];
+                MEM2WB.ALUout += Dmem[MEM2WB.mem_addr*8+i];
             }
             if(MEM2WB.ALUout & 0x8000)MEM2WB.ALUout = MEM2WB.ALUout | 0xFFFF0000;
         }
-        else if(EX2MEM.opcode == lhu)
+        else if(MEM2WB.opcode == lhu)
         {
-            MEM2WB.opcode = EX2MEM.opcode;
             MEM2WB.ALUout = 0;
             int i;
             for(i=0; i<16; i++)
             {
                 MEM2WB.ALUout =  MEM2WB.ALUout <<1;
-                MEM2WB.ALUout += Dmem[EX2MEM.addr*8+i];
+                MEM2WB.ALUout += Dmem[MEM2WB.mem_addr*8+i];
             }
         }
-        else if(EX2MEM.opcode == lb)
+        else if(MEM2WB.opcode == lb)
         {
-            MEM2WB.opcode = EX2MEM.opcode;
             MEM2WB.ALUout = 0;
             int i;
             for(i=0; i<8; i++)
             {
                 MEM2WB.ALUout =  MEM2WB.ALUout <<1;
-                MEM2WB.ALUout += Dmem[EX2MEM.addr*8+i];
+                MEM2WB.ALUout += Dmem[MEM2WB.mem_addr*8+i];
             }
             if(MEM2WB.ALUout & 0x80)MEM2WB.ALUout = MEM2WB.ALUout | 0xFFFFFF00;
         }
-        else if(EX2MEM.opcode == lbu)
+        else if(MEM2WB.opcode == lbu)
         {
-            MEM2WB.opcode = EX2MEM.opcode;
             MEM2WB.ALUout = 0;
             int i;
             for(i=0; i<8; i++)
             {
                 MEM2WB.ALUout =  MEM2WB.ALUout <<1;
-                MEM2WB.ALUout += Dmem[EX2MEM.addr*8+i];
+                MEM2WB.ALUout += Dmem[MEM2WB.mem_addr*8+i];
             }
         }
     }
-    else if(EX2MEM.mem_write == 1)
+    else if(MEM2WB.mem_write == 1 && (MEM2WB.opcode==0x2B || MEM2WB.opcode==0x29 || MEM2WB.opcode==0x28))
     {
-        if(EX2MEM.opcode ==sw)
+        if(MEM2WB.opcode ==sw)
         {
             int i;
-            for(i=0; i<32; i++)
+            int tmp = 0;
+            for(i=0;i<32;i++)
             {
-                Dmem[EX2MEM.addr*8 + i] = EX2MEM.tmp_dmem[i];
-            }
+                Dmem[MEM2WB.mem_addr*8 + i] = EX2MEM.tmp_dmem[i];
+                tmp = tmp<<1;
+                tmp +=EX2MEM.tmp_dmem[i];
+            }printf("<<<<<<<<<<<<<<<<<<<<change in :%d %08X>>>>>>>>>>>>>>>>>\n",MEM2WB.mem_addr,tmp);
         }
-        else if(EX2MEM.opcode == sh)
+        else if(MEM2WB.opcode == sh)
         {
             int i;
-            MEM2WB.ALUout = 0;
             for(i=0; i<16; i++)
             {
-                Dmem[EX2MEM.addr*8 + i] = EX2MEM.tmp_dmem[i];
+                Dmem[MEM2WB.mem_addr*8 + i] = EX2MEM.tmp_dmem[i];
             }
         }
-        else if(EX2MEM.opcode == sb)
+        else if(MEM2WB.opcode == sb)
         {
             int i;
             for(i=0; i<8; i++)
             {
-                Dmem[EX2MEM.addr * 8 + i] = EX2MEM.tmp_dmem[i];
+                Dmem[MEM2WB.mem_addr * 8 + i] = EX2MEM.tmp_dmem[i];
             }
         }
     }
-    else if(EX2MEM.opcode == jal)
+    else if(MEM2WB.opcode == jal /*&& MEM2WB.RegWrite ==1*/)
     {
+        printf("go jal %08X\n",EX2MEM.ALUout);
         MEM2WB.jal_out = 1;
         MEM2WB.ALUout = EX2MEM.addr;
     }

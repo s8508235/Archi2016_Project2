@@ -1,10 +1,10 @@
 #include "wb.h"
 void WB()
-{
+{/*
     if(MEM2WB.jal_out == 1)
     {
-        currpc = MEM2WB.ALUout;
-    }
+        reg[31] = MEM2WB.ALUout;
+    }*/
 printf("------------------------cycle:%d-------------------- currpc:%d\n",cycle,currpc);
 printf("%s :%d %d %08X\n",tmp_wb.command,tmp_wb.RegWrite ,tmp_wb.write_dest,tmp_wb.ALUout);
 printf("%s :%d %d %08X\n",MEM2WB.command,MEM2WB.RegWrite ,MEM2WB.write_dest,MEM2WB.ALUout);
@@ -23,7 +23,7 @@ printf("%s :%d %d %08X\n",MEM2WB.command,MEM2WB.RegWrite ,MEM2WB.write_dest,MEM2
     if(MEM2WB.write_dest ==0 && MEM2WB.isNop == 0 && MEM2WB.RegWrite == 1 && strcmp(MEM2WB.command,"HALT")!=0)
     {
         err_processing(Writeto0);
-    }
+    }/*
     written_in_this_cycle.opcode = tmp_wb.opcode;
     written_in_this_cycle.addr = tmp_wb.addr;
     written_in_this_cycle.write_dest = tmp_wb.write_dest;
@@ -38,7 +38,9 @@ printf("%s :%d %d %08X\n",MEM2WB.command,MEM2WB.RegWrite ,MEM2WB.write_dest,MEM2
     written_in_this_cycle.mem_read = tmp_wb.mem_read;
     written_in_this_cycle.mem_write = tmp_wb.mem_write;
     written_in_this_cycle.RegWrite = tmp_wb.RegWrite;
-
+    written_in_this_cycle.mem_addr = tmp_wb.mem_addr;
+    written_in_this_cycle.mem_data = tmp_wb.mem_data;
+*/
     tmp_wb.opcode = MEM2WB.opcode;
     tmp_wb.addr = MEM2WB.addr;
     tmp_wb.write_dest = MEM2WB.write_dest;
@@ -53,4 +55,6 @@ printf("%s :%d %d %08X\n",MEM2WB.command,MEM2WB.RegWrite ,MEM2WB.write_dest,MEM2
     tmp_wb.mem_read = MEM2WB.mem_read;
     tmp_wb.mem_write = MEM2WB.mem_write;
     tmp_wb.RegWrite = MEM2WB.RegWrite;
+    tmp_wb.mem_addr = MEM2WB.mem_addr;
+    tmp_wb.mem_data = MEM2WB.mem_data;
 }

@@ -64,6 +64,8 @@ typedef struct EX_MEM
     int forward_mess;
     int isFlush;
     int forward_pos;
+    int mem_addr;
+    int mem_data;
 }EX_MEM;
 extern EX_MEM EX2MEM;
 EX_MEM EX2MEM;
@@ -87,10 +89,12 @@ typedef struct MEM_WB
     int mem_read;
     int can_forward;
     int forward_mess;
+    int mem_addr;
+    int mem_data;
 }MEM_WB;
 extern MEM_WB MEM2WB;
 MEM_WB MEM2WB;
 MEM_WB tmp_wb;
-MEM_WB written_in_this_cycle;
+//MEM_WB written_in_this_cycle;
 void init_buffer();
 #endif // BUFFER_H_INCLUDED

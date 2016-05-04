@@ -7,6 +7,5 @@ void EX();
 void implementR();
 void implementJ();
 void implementI();
-//void forwards_detect();
-int masks[31];
+int masks[32];
 #endif // EX_H_INCLUDED

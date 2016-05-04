@@ -51,6 +51,8 @@ void init_buffer()
     EX2MEM.forward_mess = 0;
     EX2MEM.isFlush = 0;
     EX2MEM.forward_pos = 0;
+    EX2MEM.mem_addr = 0;
+    EX2MEM.mem_data = 0;
 
     MEM2WB.ALUout = 0;
     MEM2WB.jal_out = 0;
@@ -68,6 +70,8 @@ void init_buffer()
     MEM2WB.mem_write = 0;
     MEM2WB.can_forward = 0;
     MEM2WB.forward_mess = 0;
+    MEM2WB.mem_addr = 0;
+    MEM2WB.mem_data = 0;
 
     tmp_wb.ALUout = 0;
     tmp_wb.jal_out = 0;
@@ -84,8 +88,10 @@ void init_buffer()
     tmp_wb.mem_write = 0;
     tmp_wb.can_forward = 0;
     tmp_wb.forward_mess = 0;
+    tmp_wb.mem_addr = 0;
+    tmp_wb.mem_data = 0;
 
-
+/*
     written_in_this_cycle.ALUout = 0;
     written_in_this_cycle.jal_out = 0;
     written_in_this_cycle.opcode = 0;
@@ -101,4 +107,6 @@ void init_buffer()
     written_in_this_cycle.mem_write = 0;
     written_in_this_cycle.can_forward = 0;
     written_in_this_cycle.forward_mess = 0;
+    written_in_this_cycle.mem_addr = 0;
+    tmp_wb.mem_data = 0;*/
 }
