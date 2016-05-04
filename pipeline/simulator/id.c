@@ -24,12 +24,12 @@ void ID()
         ID2EX.rd = 0;
         ID2EX.immediate = 0;
     }
+    ID2EX.instruction_op =IF2ID.instruction_op ;
     ID2EX.isFlush = 0;
     end_program = 0;
     int i;
     if(ID2EX.isStall == 0)
     {
-        ID2EX.instruction_op =IF2ID.instruction_op ;
         for(i=0; i<6; i++)
         {
             op_num  = op_num<< 1 ;
@@ -156,6 +156,7 @@ if(ID2EX.isStall == 0 && ID2EX.go_forward == 0 && EX2MEM.go_forward == 0)
 
 }
     printf("************get %s numbers : %d %d %d %08X %08X %08X\n",ID2EX.command,rs,rt,rd,ID2EX.tmp_rs,ID2EX.tmp_rt,ID2EX.immediate);
+    printf("%08X\n",ID2EX.instruction_op);
 }
 void instruction_R()
 {
@@ -263,7 +264,7 @@ void instruction_I()
         ID2EX.immediate = imm;
     }
     else
-    {
+    {printf("exxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxe\n");
         unsigned eximm;
         if(imm & 0x8000)
             eximm = imm | 0xffff0000;

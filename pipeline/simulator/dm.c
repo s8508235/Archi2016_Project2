@@ -28,21 +28,21 @@ void DM()
             tmp_wb.stop = 1;
         }
         if(EX2MEM.RegWrite ==1)
-        {
+        {printf("RRRRRRRRRRRRRRRRRRRRRRRRRRR %d\n",EX2MEM.ALUout);
             MEM2WB.ALUout = EX2MEM.ALUout;
         }
     if(EX2MEM.mem_read == 1)
     {
         if(EX2MEM.opcode == lw)
         {
-            MEM2WB.opcode = EX2MEM.opcode;
             MEM2WB.ALUout = 0;
             int i;
             for(i=0; i<32; i++)
             {
                 MEM2WB.ALUout =  MEM2WB.ALUout <<1;
-                MEM2WB.ALUout += Dmem[EX2MEM.addr*8+i];
+                MEM2WB.ALUout += Dmem[MEM2WB.addr*8+i];
             }
+            printf("%d+++++++++++++determine lw's value: %08X\n",EX2MEM.write_dest,MEM2WB.ALUout);
         }
         else if(EX2MEM.opcode == lh)
         {

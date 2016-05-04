@@ -61,8 +61,6 @@ void EX()
     EX2MEM.isNop = ID2EX.isNop;
     EX2MEM.immediate = ID2EX.immediate;
     printf("re:%d %d %d \n",ID2EX.rs,ID2EX.rt,written_in_this_cycle.write_dest);
-   // EX2MEM.tmp_rs = ID2EX.tmp_rs;
-  //  EX2MEM.tmp_rt = ID2EX.tmp_rt;
     EX2MEM.go_forward = 0;
     EX2MEM.num_error = 0;
     EX2MEM.mem_error = 0;
@@ -205,7 +203,7 @@ void implementR()
     }
     else if (ID2EX.func == jr)
     {
-        currpc = ID2EX.tmp_rs - pc -4;
+        currpc = ID2EX.tmp_rs - pc;
         //  *pc = reg[rs]-unmod_pc-4 ;
     }
 }
@@ -240,6 +238,9 @@ void implementI()
         sImm = (ID2EX.immediate & mask_31)?1:0;
         addr = ID2EX.immediate + ID2EX.tmp_rs;
         sAddr =(addr & mask_31)?1:0;
+        printf("my op: %08X\n",EX2MEM.instruction_op);
+        printf("LWWWWWWWWWWWWWWWWW:%08X %08X %08X\n",ID2EX.immediate,ID2EX.tmp_rs,addr);
+        printf("%d\n",ID2EX.rt);
         if(sRs == sImm && sAddr!=sRs)
         {
             EX2MEM.num_error = 1;

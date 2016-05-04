@@ -7,6 +7,7 @@ void WB()
     }
 printf("------------------------cycle:%d-------------------- currpc:%d\n",cycle,currpc);
 printf("%s :%d %d %08X\n",tmp_wb.command,tmp_wb.RegWrite ,tmp_wb.write_dest,tmp_wb.ALUout);
+printf("%s :%d %d %08X\n",MEM2WB.command,MEM2WB.RegWrite ,MEM2WB.write_dest,MEM2WB.ALUout);
     if(tmp_wb.RegWrite ==1)
     {
         if(tmp_wb.opcode == halt)
