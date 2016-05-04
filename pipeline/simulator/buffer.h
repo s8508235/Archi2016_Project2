@@ -3,7 +3,7 @@
 #include "buffer.h"
 typedef struct IF_ID
 {
-    unsigned pc;
+    unsigned  pc;
     unsigned instrcution[32];
     unsigned int opcode;
     unsigned int instruction_op;

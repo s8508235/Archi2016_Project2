@@ -3,7 +3,13 @@ void IF()
 {
         int i,k;
         IF2ID.pc = currpc;
-        k = IF2ID.pc / 4;
+	int tmp = IF2ID.pc;
+        k = tmp / 4;
+	for(i = 0;i<32;i++)
+	{
+	   IF2ID.instrcution[i] = 0;
+	}
+	IF2ID.instruction_op = 0;
         if(k < 0) {
             IF2ID.pc += 4;
             return ;
@@ -14,7 +20,6 @@ void IF()
         }
         if(ID2EX.isStall ==0 && ID2EX.isFlush ==0)
             IF2ID.pc +=4;
-       // else printf("stop!!!!!\n");
         int op_num = 0;
         for(i=0;i<6;i++)
         {
