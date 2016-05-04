@@ -4,10 +4,10 @@ void WB()
     if(MEM2WB.jal_out == 1)
     {
         reg[31] = MEM2WB.ALUout;
-    }*/
+    }*//*
 printf("------------------------cycle:%d-------------------- currpc:%d\n",cycle,currpc);
 printf("%s :%d %d %08X\n",tmp_wb.command,tmp_wb.RegWrite ,tmp_wb.write_dest,tmp_wb.ALUout);
-printf("%s :%d %d %08X\n",MEM2WB.command,MEM2WB.RegWrite ,MEM2WB.write_dest,MEM2WB.ALUout);
+printf("%s :%d %d %08X\n",MEM2WB.command,MEM2WB.RegWrite ,MEM2WB.write_dest,MEM2WB.ALUout);*/
     if(tmp_wb.RegWrite ==1)
     {
         if(tmp_wb.opcode == halt)
@@ -17,7 +17,7 @@ printf("%s :%d %d %08X\n",MEM2WB.command,MEM2WB.RegWrite ,MEM2WB.write_dest,MEM2
         else if(tmp_wb.write_dest !=0)
         {
             reg[tmp_wb.write_dest] = tmp_wb.ALUout;
-            printf("-------------%d :%s write %08x in wb %d--------------\n",cycle,tmp_wb.command,tmp_wb.ALUout,tmp_wb.write_dest);
+       //     printf("-------------%d :%s write %08x in wb %d--------------\n",cycle,tmp_wb.command,tmp_wb.ALUout,tmp_wb.write_dest);
         }
     }
     if(MEM2WB.write_dest ==0 && MEM2WB.isNop == 0 && MEM2WB.RegWrite == 1 && strcmp(MEM2WB.command,"HALT")!=0)

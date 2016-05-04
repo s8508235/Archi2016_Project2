@@ -19,8 +19,8 @@ void DM()
     MEM2WB.mem_write = EX2MEM.mem_write;
     MEM2WB.RegWrite = EX2MEM.RegWrite;
     if(MEM2WB.mem_write == 1)
-    printf("write::%08X\n",MEM2WB.mem_addr);
-    printf("%s %d %d %d\n",MEM2WB.command,MEM2WB.mem_write,MEM2WB.mem_read,MEM2WB.RegWrite);
+ //   printf("write::%08X\n",MEM2WB.mem_addr);
+  //  printf("%s %d %d %d\n",MEM2WB.command,MEM2WB.mem_write,MEM2WB.mem_read,MEM2WB.RegWrite);
         if(MEM2WB.mem_error ==1)
         {
             err_processing(MemaddrOver);
@@ -31,7 +31,7 @@ void DM()
             err_processing(DataMis);
             tmp_wb.stop = 1;
         }
-
+/*
             int x,y;
             printf("Dmem:\n");//num_D*4 bytes => 32*num_D bits
             for(x=0;x<num_D;x++)
@@ -45,7 +45,7 @@ void DM()
                 }
                 printf("%08X",w);
                 printf("\n");
-            }
+            }*/
     if(MEM2WB.RegWrite ==1 )
     {
         MEM2WB.ALUout = EX2MEM.ALUout;
@@ -61,7 +61,7 @@ void DM()
                 MEM2WB.ALUout =  MEM2WB.ALUout <<1;
                 MEM2WB.ALUout += Dmem[MEM2WB.mem_addr*8+i];
             }
-            printf("%d+++++++++++++determine lw's value: %08X\n",MEM2WB.write_dest,MEM2WB.ALUout);
+          //  printf("%d+++++++++++++determine lw's value: %08X\n",MEM2WB.write_dest,MEM2WB.ALUout);
         }
         else if(MEM2WB.opcode == lh)
         {
@@ -117,7 +117,7 @@ void DM()
                 Dmem[MEM2WB.mem_addr*8 + i] = EX2MEM.tmp_dmem[i];
                 tmp = tmp<<1;
                 tmp +=EX2MEM.tmp_dmem[i];
-            }printf("<<<<<<<<<<<<<<<<<<<<change in :%d %08X>>>>>>>>>>>>>>>>>\n",MEM2WB.mem_addr,tmp);
+            }//printf("<<<<<<<<<<<<<<<<<<<<change in :%d %08X>>>>>>>>>>>>>>>>>\n",MEM2WB.mem_addr,tmp);
         }
         else if(MEM2WB.opcode == sh)
         {
@@ -138,7 +138,7 @@ void DM()
     }
     else if(MEM2WB.opcode == jal /*&& MEM2WB.RegWrite ==1*/)
     {
-        printf("go jal %08X\n",EX2MEM.ALUout);
+       // printf("go jal %08X\n",EX2MEM.ALUout);
         MEM2WB.jal_out = 1;
         MEM2WB.ALUout = EX2MEM.addr;
     }

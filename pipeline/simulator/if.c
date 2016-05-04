@@ -14,7 +14,7 @@ void IF()
         }
         if(ID2EX.isStall ==0 && ID2EX.isFlush ==0)
             IF2ID.pc +=4;
-        else printf("stop!!!!!\n");
+       // else printf("stop!!!!!\n");
         int op_num = 0;
         for(i=0;i<6;i++)
         {

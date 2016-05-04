@@ -24,40 +24,40 @@ void EX()
  //   printf("change is not :%d %d\n",EX2MEM.tmp_rs,EX2MEM.tmp_rt);
     if(EX2MEM.go_forward ==1)
     {
-        printf("~~~~~~~go 1\n");
+     //   printf("~~~~~~~go 1\n");
         EX2MEM.forward_mess = 1;
         EX2MEM.tmp_rs = MEM2WB.ALUout;
-        printf("%08x\n",EX2MEM.tmp_rs);
-        printf("forward : %08X \n",MEM2WB.ALUout);
+//      printf("%08x\n",EX2MEM.tmp_rs);
+       // printf("forward : %08X \n",MEM2WB.ALUout);
         ID2EX.isStall = 0;
     }
     else if(EX2MEM.go_forward ==2)
     {
         EX2MEM.forward_mess = 2;
-        printf("~~~~~~~~~~go 2\n");
+      //  printf("~~~~~~~~~~go 2\n");
         EX2MEM.tmp_rt = MEM2WB.ALUout;
-        printf("%08x\n",EX2MEM.tmp_rt);
-        printf("forward : %08X \n",MEM2WB.ALUout);
+      //  printf("%08x\n",EX2MEM.tmp_rt);
+      //  printf("forward : %08X \n",MEM2WB.ALUout);
         ID2EX.isStall = 0;
     }
     else if(EX2MEM.go_forward == 3)
     {
         EX2MEM.forward_mess = 3;
-        printf("~~~~~~~~~~go 3\n");
+        //printf("~~~~~~~~~~go 3\n");
         EX2MEM.tmp_rs = MEM2WB.ALUout;
         EX2MEM.tmp_rt = MEM2WB.ALUout;
         printf("%08X %08x\n",EX2MEM.tmp_rs,EX2MEM.tmp_rt);
-        printf("forward : %08X \n",MEM2WB.ALUout);
+      //  printf("forward : %08X \n",MEM2WB.ALUout);
         ID2EX.isStall = 0;
     }
 
     if(ID2EX.isStall ==1)
     {
-        printf("~~~~~~~~insert\n");
+   //     printf("~~~~~~~~insert\n");
         EX2MEM.isNop = 1;
         EX2MEM.instruction_op = 0;
         EX2MEM.opcode = 0;
-        EX2MEM.command = "!!!!!!!!!";
+        EX2MEM.command = "NOP";
         EX2MEM.write_dest = 0;
         EX2MEM.tmp_rs = 0;
         EX2MEM.tmp_rt = 0;

@@ -3,7 +3,7 @@
 int prev_tmprs;
 int prev_tmprt;
 void ID()
-{printf("currpc : %08X pc :%08X PC :%08X\n",currpc,pc ,currpc + pc);
+{//printf("currpc : %08X pc :%08X PC :%08X\n",currpc,pc ,currpc + pc);
     ID2EX.forward_mess = 0;
     ID2EX.addr  =IF2ID.pc;
     op_num = 0;
@@ -11,7 +11,7 @@ void ID()
     if(ID2EX.isFlush ==1)
     {
         //insert nop
-        printf("^^^^^^^^^^^^^^^^^^^^^^^^\n");
+     //   printf("^^^^^^^^^^^^^^^^^^^^^^^^\n");
         ID2EX.opcode = 0;
         ID2EX.isNop = 1;
         ID2EX.command = "NOP";
@@ -96,6 +96,7 @@ void ID()
             ID2EX.opcode = op_num;
             end_program = 1;
             ID2EX.command = "HALT";
+            ID2EX.isNop = 0;
         }
         else
         {
@@ -114,17 +115,17 @@ void ID()
         else //if(written_in_this_cycle.RegWrite ==1)
             ID2EX.tmp_rt = reg[rt];
    //     printf("%d %d\n",ID2EX.tmp_rs,ID2EX.tmp_rt);
-        printf("no reading\n");
+   //     printf("no reading\n");
     }
     prediction();
     ID2EX.isStall = 0;
     stall_detect();
-    printf("stall & forward:%d %d~~~~~~~~~~~~~\n",ID2EX.isStall,EX2MEM.go_forward);
+  //  printf("stall & forward:%d %d~~~~~~~~~~~~~\n",ID2EX.isStall,EX2MEM.go_forward);
     ID2EX.stop = end_program;
     //judge flush
 if(ID2EX.isStall == 0 && ID2EX.go_forward == 0 && EX2MEM.go_forward == 0)
 {
-    printf("ready to flush!!!!!!!!!!!!!!!!!! \n");
+    //printf("ready to flush!!!!!!!!!!!!!!!!!! \n");
     if(strcmp(ID2EX.command,"BGTZ") ==0)
     {
         int sRG = (ID2EX.tmp_rs & 0x80000000)?1:0;
@@ -134,7 +135,7 @@ if(ID2EX.isStall == 0 && ID2EX.go_forward == 0 && EX2MEM.go_forward == 0)
         }
     }
     else if(strcmp(ID2EX.command,"BEQ") ==0)
-    {printf("compare:%d %d\n",ID2EX.tmp_rs,ID2EX.tmp_rt);
+    {//printf("compare:%d %d\n",ID2EX.tmp_rs,ID2EX.tmp_rt);
         if(ID2EX.tmp_rs == ID2EX.tmp_rt)
         {
             ID2EX.isFlush = 1;
@@ -152,7 +153,7 @@ if(ID2EX.isStall == 0 && ID2EX.go_forward == 0 && EX2MEM.go_forward == 0)
         ID2EX.isFlush = 1;
     }
     else if(strcmp(ID2EX.command,"JAL") ==0)
-    {printf("go jal\n");
+    {//printf("go jal\n");
         ID2EX.isFlush = 1;
     }
     else if(strcmp(ID2EX.command,"J") ==0)
@@ -232,7 +233,7 @@ void instruction_R()
         {
             ID2EX.isNop = 1;
             ID2EX.command ="NOP";
-            printf("match nop\n");
+        //    printf("match nop\n");
         }
     }
     else if (func == srl)
@@ -374,7 +375,7 @@ void instruction_J()
     {
        // ID2EX.addr = ((pc + IF2ID.pc + 4) & 0x80000000 )| (4 * imm);
         ID2EX.command = "J";
-        printf("JOOOOOOOOOOOOOOOOOO\n");
+  //      printf("JOOOOOOOOOOOOOOOOOO\n");
         ID2EX.RegWrite = 0;
     }
     else if(op_num == jal)
