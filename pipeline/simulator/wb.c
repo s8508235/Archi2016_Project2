@@ -17,7 +17,8 @@ printf("%s :%d %d %08X\n",MEM2WB.command,MEM2WB.RegWrite ,MEM2WB.write_dest,MEM2
         else if(tmp_wb.write_dest !=0)
         {
             reg[tmp_wb.write_dest] = tmp_wb.ALUout;
-       //     printf("-------------%d :%s write %08x in wb %d--------------\n",cycle,tmp_wb.command,tmp_wb.ALUout,tmp_wb.write_dest);
+        if(tmp_wb.opcode == jal)  
+	 printf("-------------%d :%s write %08x in wb %d--------------\n",cycle,tmp_wb.command,tmp_wb.ALUout,tmp_wb.write_dest);
         }
     }
     if(MEM2WB.write_dest ==0 && MEM2WB.isNop == 0 && MEM2WB.RegWrite == 1 && strcmp(MEM2WB.command,"HALT")!=0)

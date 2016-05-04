@@ -135,8 +135,9 @@ void DM()
     }
     else if(MEM2WB.opcode == jal /*&& MEM2WB.RegWrite ==1*/)
     {
-       // printf("go jal %08X\n",EX2MEM.ALUout);
+//        printf("go jal %08X\n",EX2MEM.ALUout);
         MEM2WB.jal_out = 1;
-        MEM2WB.ALUout = EX2MEM.addr;
+	
+        MEM2WB.ALUout = EX2MEM.ALUout;
     }
 }

@@ -8,7 +8,7 @@ void ID()
     ID2EX.addr  =IF2ID.pc;
     op_num = 0;
     ID2EX.jal_tmp = 0;
-    if(ID2EX.isFlush ==1)
+    if(ID2EX.isFlush ==1/* || currpc < 0 || currpc > num_I *4*/ )
     {
         //insert nop
      //   printf("^^^^^^^^^^^^^^^^^^^^^^^^\n");
@@ -383,6 +383,7 @@ void instruction_J()
        // ID2EX.addr = ((pc + IF2ID.pc + 4) & 0x80000000 )| (4 * imm);
         ID2EX.command = "JAL";
         ID2EX.jal_tmp = pc + IF2ID.pc;
+//	printf("ID2EX:%08X\n",ID2EX.jal_tmp);
     }
 
 }/*

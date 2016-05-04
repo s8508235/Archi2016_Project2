@@ -110,6 +110,7 @@ void implementJ()
    //     printf("JAL!!!\n");
         currpc = (((ID2EX.addr+pc) & 0xf0000000) | (x)) - pc;
         EX2MEM.ALUout = ID2EX.jal_tmp;
+//	printf("after:%08X\n",EX2MEM.ALUout);
         EX2MEM.write_dest = 31;
         //pc = ID2EX.addr;
     }
