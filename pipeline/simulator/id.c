@@ -457,10 +457,11 @@ void prediction()
     {if(ID2EX.opcode == 0)
         if(rs == rt && ID2EX.isNop ==0 && rs !=0)
         {
-            if(EX2MEM.write_dest == rs && EX2MEM.isNop==0 )
+            if(EX2MEM.write_dest == rs )
             {//printf("%d:change!!! %s \n",cycle,ID2EX.command);
-                flag_rs_exmem = 0;
-                flag_rt_exmem = 1;
+                if(flag_rs_exmem == 1){
+		flag_rs_exmem = 0;
+                flag_rt_exmem = 1;}
             }
         }
     }//if(rs==rt) flag_rt_exmem = flag_rs_exmem;
@@ -514,9 +515,25 @@ void prediction()
         }
         if((MEM2WB.opcode == R && MEM2WB.func != 8) || (MEM2WB.opcode >= 8 && MEM2WB.opcode <= 15) || (MEM2WB.opcode == jal))
             MEM2WB.can_forward = 1;
-//if(rs == rt)
-//flag_rt_memwb = flag_rs_memwb;
+            
+if(func == sll || func == sra  || func == srl)
+    {if(ID2EX.opcode == 0)
+        if(rs == rt && ID2EX.isNop ==0 && rs !=0)
+        {
+            if(MEM2WB.write_dest == rs )
+            {//printf("%d:change!!! %s \n",cycle,ID2EX.command);
+                if(flag_rs_memwb == 1){
+	             	flag_rs_memwb = 0;
+                flag_rt_memwb = 1;}
+            }
+        }
     }
+    }
+            if(MEM2WB.mem_error ==1 || MEM2WB.data_miss == 1)
+            {
+                flag_rs_memwb = 0;
+                flag_rt_memwb = 0;
+            }
 }
 void stall_detect()
 {   if(EX2MEM.isNop ==1 && MEM2WB.isNop ==1) return ;/*
