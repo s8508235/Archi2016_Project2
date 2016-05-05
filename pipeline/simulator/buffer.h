@@ -66,6 +66,7 @@ typedef struct EX_MEM
     int forward_pos;
     int mem_addr;
     int mem_data;
+    int true_forward_pos;
 }EX_MEM;
 extern EX_MEM EX2MEM;
 EX_MEM EX2MEM;

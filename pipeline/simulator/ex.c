@@ -27,6 +27,7 @@ void EX()
      //   printf("~~~~~~~go 1\n");
         EX2MEM.forward_mess = 1;
         EX2MEM.tmp_rs = MEM2WB.ALUout;
+        EX2MEM.true_forward_pos = EX2MEM.forward_pos;
 //      printf("%08x\n",EX2MEM.tmp_rs);
        // printf("forward : %08X \n",MEM2WB.ALUout);
         ID2EX.isStall = 0;
@@ -36,6 +37,7 @@ void EX()
         EX2MEM.forward_mess = 2;
       //  printf("~~~~~~~~~~go 2\n");
         EX2MEM.tmp_rt = MEM2WB.ALUout;
+        EX2MEM.true_forward_pos = EX2MEM.forward_pos;
       //  printf("%08x\n",EX2MEM.tmp_rt);
       //  printf("forward : %08X \n",MEM2WB.ALUout);
         ID2EX.isStall = 0;
@@ -44,10 +46,9 @@ void EX()
     {
         EX2MEM.forward_mess = 3;
         //printf("~~~~~~~~~~go 3\n");
+        EX2MEM.true_forward_pos = EX2MEM.forward_pos;
         EX2MEM.tmp_rs = MEM2WB.ALUout;
         EX2MEM.tmp_rt = MEM2WB.ALUout;
-        printf("%08X %08x\n",EX2MEM.tmp_rs,EX2MEM.tmp_rt);
-      //  printf("forward : %08X \n",MEM2WB.ALUout);
         ID2EX.isStall = 0;
     }
 
@@ -224,8 +225,9 @@ void implementI()
         EX2MEM.ALUout = EX2MEM.tmp_rs + ID2EX.immediate;
         EX2MEM.write_dest = ID2EX.rt;
         sRt = (EX2MEM.ALUout & mask_31)?1:0;
+	sImm = (ID2EX.immediate & mask_31)?1:0;
    //     printf("@@@@@@@@@@@@@@@@%08X %08X %08X\n",EX2MEM.ALUout,EX2MEM.tmp_rs,ID2EX.immediate);
-        if(sRs == (ID2EX.immediate & mask_31) && sRs !=sRt)
+        if(sRs == sImm  && sRs !=sRt)
         {
             EX2MEM.num_error = 1;
             err_processing(NumOver);
@@ -594,8 +596,7 @@ void implementI()
         {
             int x = ID2EX.immediate;
             x = x<<2 ;
-            currpc = ID2EX.addr + x - pc;
-            //  *pc = *pc  +x;
+            currpc = ID2EX.addr + x;
         }
     }
 }

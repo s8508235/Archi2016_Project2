@@ -26,7 +26,7 @@ int main()
     if(dsize >=1032) dsize = 1032;
     int i;
     char ibuffer[1032],dbuffer[1032];
-    unsigned int iimage[isize],dimage[dsize];
+    unsigned int iimage[1032],dimage[1032];
     memset(ibuffer,0,sizeof(ibuffer));
     memset(iimage,0,sizeof(iimage));
     memset(dbuffer,0,sizeof(dbuffer));
@@ -46,6 +46,7 @@ int main()
     {
         dimage[i] =(unsigned char) dbuffer[i]-'\0';
     }
+
     fclose(iImageData);
     fclose(dImageData);
 
@@ -136,11 +137,11 @@ int main()
         }
         fprintf(out,"\n");
         fprintf(out,"EX: %s",(/*(EX2MEM.command =="SLL" && EX2MEM.instruction_op ==0x00000000 )||*/ EX2MEM.isNop ==1)?"NOP":EX2MEM.command);
-        if(EX2MEM.forward_mess ==1) fprintf(out," fwd_EX-DM_rs_$%d",EX2MEM.forward_pos);
-        else if(EX2MEM.forward_mess ==2) fprintf(out," fwd_EX-DM_rt_$%d",EX2MEM.forward_pos);
+        if(EX2MEM.forward_mess ==1) fprintf(out," fwd_EX-DM_rs_$%d",EX2MEM.true_forward_pos);
+        else if(EX2MEM.forward_mess ==2) fprintf(out," fwd_EX-DM_rt_$%d",EX2MEM.true_forward_pos);
         else if(EX2MEM.forward_mess == 3)
         {
-            fprintf(out," fwd_EX-DM_rs_$%d fwd_EX-DM_rt_$%d",EX2MEM.forward_pos,EX2MEM.forward_pos);
+            fprintf(out," fwd_EX-DM_rs_$%d fwd_EX-DM_rt_$%d",EX2MEM.true_forward_pos,EX2MEM.true_forward_pos);
         }
         fprintf(out,"\n");
         fprintf(out,"DM: %s\n",(/*(MEM2WB.command =="SLL" && MEM2WB.instruction_op ==0x00000000 )|| */MEM2WB.isNop ==1)?"NOP":MEM2WB.command);

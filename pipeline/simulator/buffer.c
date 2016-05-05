@@ -53,7 +53,7 @@ void init_buffer()
     EX2MEM.forward_pos = 0;
     EX2MEM.mem_addr = 0;
     EX2MEM.mem_data = 0;
-
+    EX2MEM.true_forward_pos = 0;
     MEM2WB.ALUout = 0;
     MEM2WB.jal_out = 0;
     MEM2WB.opcode = 0;

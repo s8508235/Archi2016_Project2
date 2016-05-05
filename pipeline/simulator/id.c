@@ -8,10 +8,8 @@ void ID()
     ID2EX.addr  =IF2ID.pc;
     op_num = 0;
     ID2EX.jal_tmp = 0;
-    if(ID2EX.isFlush ==1/* || currpc < 0 || currpc > num_I *4*/ )
+    if(ID2EX.isFlush ==1 /*|| currpc < 0 || currpc > num_I *8*/ )
     {
-        //insert nop
-     //   printf("^^^^^^^^^^^^^^^^^^^^^^^^\n");
         ID2EX.opcode = 0;
         ID2EX.isNop = 1;
         ID2EX.command = "NOP";
@@ -128,8 +126,8 @@ if(ID2EX.isStall == 0 && ID2EX.go_forward == 0 && EX2MEM.go_forward == 0)
     //printf("ready to flush!!!!!!!!!!!!!!!!!! \n");
     if(strcmp(ID2EX.command,"BGTZ") ==0)
     {
-        int sRG = (ID2EX.tmp_rs & 0x80000000)?1:0;
-        if(sRG == 0)
+        int sRG = ID2EX.tmp_rs;
+        if(sRG >  0)
         {
             ID2EX.isFlush = 1;
         }
@@ -220,20 +218,18 @@ void instruction_R()
     {
         ID2EX.command = "SLL";
         int x,flag = 0;
-        for(x= 0;x<32;x++)
+        for(x= 11;x<32;x++)
         {
-            if((x>=0 && x<=5)|| x>= 10)
-                if(IF2ID.instrcution[x] ==1)
-                {
-                    flag = 1;
-                    break;
-                }
+           if(IF2ID.instrcution[x] ==1)
+           {
+                flag = 1;
+                break;
+           }
         }
         if(flag ==0)
         {
             ID2EX.isNop = 1;
             ID2EX.command ="NOP";
-        //    printf("match nop\n");
         }
     }
     else if (func == srl)
@@ -402,6 +398,7 @@ void prediction()
     flag_rs_memwb = 0;
     flag_rt_memwb = 0;
     EX2MEM.can_forward = 0;
+    if(EX2MEM.RegWrite ==1)
     if(EX2MEM.write_dest !=0)
     {
         if(EX2MEM.write_dest == rs)
@@ -410,7 +407,12 @@ void prediction()
             {
                 if(EX2MEM.func !=8)
                 {
-                    flag_rs_exmem = 1;
+                    flag_rs_exmem = 1;/*
+                    if(rs == rt && (ID2EX.func ==0 || ID2EX.func ==2 || ID2EX.func ==3) && ID2EX.isNop ==0)
+                    {
+                        flag_rs_exmem = 0;
+                        flag_rt_exmem = 1;
+                    }*/
                 }
             }
             else
@@ -450,19 +452,20 @@ void prediction()
         }
         if(((EX2MEM.opcode == jal)||(EX2MEM.opcode == R && EX2MEM.func != 8) || (EX2MEM.opcode >= 8 && EX2MEM.opcode <= 15)))
             EX2MEM.can_forward = 1;
-    }/*
-    if(EX2MEM.forward_mess >0)
-    {printf("^^^^^^^^^^^^^^^^gone\n");
-        if(EX2MEM.write_dest == rs)
+    }
+    if(func == sll || func == sra  || func == srl)
+    {if(ID2EX.opcode == 0)
+        if(rs == rt && ID2EX.isNop ==0 && rs !=0)
         {
-            flag_rs_exmem = 0;
+            if(EX2MEM.write_dest == rs && EX2MEM.isNop==0 )
+            {//printf("%d:change!!! %s \n",cycle,ID2EX.command);
+                flag_rs_exmem = 0;
+                flag_rt_exmem = 1;
+            }
         }
-        else if(EX2MEM.write_dest ==rt)
-        {
-            flag_rt_exmem = 0;
-        }
-    */
+    }//if(rs==rt) flag_rt_exmem = flag_rs_exmem;
     MEM2WB.can_forward = 0;
+    if(MEM2WB.RegWrite ==1)
     if(MEM2WB.write_dest !=0)
     {
         if(MEM2WB.write_dest == rs)
@@ -511,8 +514,9 @@ void prediction()
         }
         if((MEM2WB.opcode == R && MEM2WB.func != 8) || (MEM2WB.opcode >= 8 && MEM2WB.opcode <= 15) || (MEM2WB.opcode == jal))
             MEM2WB.can_forward = 1;
+//if(rs == rt)
+//flag_rt_memwb = flag_rs_memwb;
     }
-   // printf("prediction!!!!!!!!!!!!\n%d %d\n",EX2MEM.can_forward,MEM2WB.can_forward);
 }
 void stall_detect()
 {   if(EX2MEM.isNop ==1 && MEM2WB.isNop ==1) return ;/*
@@ -542,9 +546,10 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);*/
         else if(flag_rs_memwb == 1)
         {//printf("rs memwb\n");
             if(MEM2WB.can_forward ==1 && (ID2EX.opcode ==bgtz|| (ID2EX.opcode ==0 && ID2EX.func ==8)))
-            {/*do forward now and here*///printf("mem2wb can forward(bgtz/jr)\n");
+            {/*do forward now and here*/
                 ID2EX.forward_mess = 1;
                 ID2EX.tmp_rs = MEM2WB.ALUout;
+		if(cycle == 54)
                 ID2EX.isStall = 0;
             }
             else ID2EX.isStall = 1;
@@ -571,7 +576,7 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);*/
         else ID2EX.isStall = 0;
     }
     else if(ID2EX.opcode != j && ID2EX.opcode != jal && ID2EX.opcode != halt)
-    {//printf("else\n");
+    {	if(ID2EX.opcode == lui){ return ;}
         if(ID2EX.rs == ID2EX.rt)
         {//printf("rs == rt\n");
             if(flag_rs_exmem ==1 )
@@ -579,7 +584,7 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);*/
                 if(EX2MEM.can_forward ==1 && ID2EX.opcode != bne && ID2EX.opcode != beq)
                 {//printf("exmem can forward\n");
                     EX2MEM.go_forward = 3;
-                    EX2MEM.forward_pos = ID2EX.rs;
+                    EX2MEM.forward_pos = EX2MEM.write_dest;
                     ID2EX.isStall = 0;
                 }
                 else
@@ -612,9 +617,9 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);*/
             {// double data hazard
                 ID2EX.isStall = 1;
             }
-            else if (flag_rs_exmem || flag_rt_exmem)
+            else if ((flag_rs_exmem || flag_rt_exmem)&& EX2MEM.can_forward ==1 )
             {//printf("exmem has flag\n");
-                if(EX2MEM.can_forward ==1 && ID2EX.opcode != bne && ID2EX.opcode != beq)
+                if( ID2EX.opcode != bne && ID2EX.opcode != beq)
                 {//printf("exmem can forward not bne/beq\n");
                     if(flag_rs_exmem)
                     {//printf("rs exmem\n");
@@ -633,9 +638,9 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);*/
                     ID2EX.isStall = 1;
                 }
             }
-            else if (flag_rs_memwb || flag_rt_memwb)
+            else if ((flag_rs_memwb || flag_rt_memwb)&&MEM2WB.can_forward ==1)
             {//printf("memwb has flag\n");
-                if(MEM2WB.can_forward ==1 && (ID2EX.opcode == bne || ID2EX.opcode == beq))
+                if( (ID2EX.opcode == bne || ID2EX.opcode == beq))
                 {//printf("memwb can forward (bne/beq)from %s forward to %s\n",MEM2WB.command,ID2EX.command);
                     if(flag_rs_memwb)
                     {//printf("rs forward\n");
@@ -654,6 +659,8 @@ printf("curr %d %d\n",ID2EX.rs,ID2EX.rt);*/
                     ID2EX.isStall = 1;
                 }
             }
+	    else if((flag_rs_exmem || flag_rt_exmem) && EX2MEM.can_forward==0) ID2EX.isStall = 1;
+	    else if((flag_rs_memwb || flag_rt_memwb) && MEM2WB.can_forward==0) ID2EX.isStall = 1;
             else
             {
                 ID2EX.isStall = 0; //no stall

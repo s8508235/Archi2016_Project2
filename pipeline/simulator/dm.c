@@ -18,6 +18,14 @@ void DM()
     MEM2WB.mem_read = EX2MEM.mem_read;
     MEM2WB.mem_write = EX2MEM.mem_write;
     MEM2WB.RegWrite = EX2MEM.RegWrite;
+    if(MEM2WB.mem_addr <0 ||MEM2WB.mem_addr >=1024)
+    {
+            err_processing(MemaddrOver);
+            if(MEM2WB.data_miss == 1)
+	    err_processing(DataMis);
+            tmp_wb.stop = 1;
+            return ;
+    }
         if(MEM2WB.mem_error ==1)
         {
             err_processing(MemaddrOver);
@@ -28,21 +36,8 @@ void DM()
             err_processing(DataMis);
             tmp_wb.stop = 1;
         }
-/*
-            int x,y;
-            printf("Dmem:\n");//num_D*4 bytes => 32*num_D bits
-            for(x=0;x<num_D;x++)
-            {
-                int w = 0;
-                for(y=0;y<32;y++)
-                {
-               //     printf("%d ",Dmem[x*32+y]);
-                    w  = w<<1;
-                    w+=Dmem[x*32+y];
-                }
-                printf("%08X",w);
-                printf("\n");
-            }*/
+	if(MEM2WB.data_miss ==1 || MEM2WB.mem_error ==1) return ;
+ 
     if(MEM2WB.RegWrite ==1 )
     {
         MEM2WB.ALUout = EX2MEM.ALUout;
